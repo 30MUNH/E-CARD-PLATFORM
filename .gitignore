@@ -37,3 +37,6 @@ reference/recordings/
 
 # Private customer media cache
 public/user-media/
+
+# Local isolated development worktrees
+.worktrees/
