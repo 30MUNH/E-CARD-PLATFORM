@@ -1,5 +1,5 @@
 import React from 'react';
-import { SLIDES } from '../data/ecardData';
+import { SLIDES, SlideDefinition } from '../data/ecardData';
 
 interface SidebarToggleButtonProps {
   toggleSidebar: () => void;
@@ -32,6 +32,7 @@ interface SidebarDrawerProps {
   setActiveIndex: (index: number) => void;
   hasVoice: boolean;
   hasVideo: boolean;
+  slides?: SlideDefinition[];
   onTouchStart?: () => void;
 }
 
@@ -41,28 +42,32 @@ export const SidebarDrawer: React.FC<SidebarDrawerProps> = ({
   activeIndex,
   setActiveIndex,
   hasVideo,
+  slides,
   onTouchStart,
 }) => {
   if (!isOpen) return null;
 
-  const visibleSlides = SLIDES.filter((slide) => !(slide.id === 'video' && !hasVideo));
+  const visibleSlides =
+    slides && slides.length > 0
+      ? slides
+      : SLIDES.filter((slide) => !(slide.id === 'video' && !hasVideo) && slide.id !== 'timeline');
 
   return (
-    <div className="absolute inset-0 z-[120] bg-[#FFF9F5] flex flex-col w-2/3 h-full pointer-events-auto">
+    <div className="absolute inset-0 z-[120] bg-[#FFF9F5] flex flex-col w-2/3 md:w-80 h-full pointer-events-auto shadow-2xl">
       <div className="flex flex-col h-full overflow-auto mt-5">
         <div className="flex-1">
-          {visibleSlides.map((slide) => {
-            const fullIndex = SLIDES.findIndex((s) => s.id === slide.id);
+          {visibleSlides.map((slide, idx) => {
+            const targetIndex = slides ? idx : SLIDES.findIndex((s) => s.id === slide.id);
             return (
               <button
                 key={slide.id}
                 onClick={() => {
-                  setActiveIndex(fullIndex);
+                  setActiveIndex(targetIndex);
                   setIsOpen(false);
                 }}
                 onTouchStart={onTouchStart}
-                className={`w-full text-left py-4 px-4 text-[#A33149] font-bold focus:outline-none ${
-                  activeIndex === fullIndex ? 'bg-[#FFE4E4]' : ''
+                className={`w-full text-left py-4 px-4 text-[#A33149] font-bold focus:outline-none hover:bg-[#FFE4E4]/60 transition ${
+                  activeIndex === targetIndex ? 'bg-[#FFE4E4]' : ''
                 }`}
               >
                 <span className="text-2xl">{slide.title}</span>

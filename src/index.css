@@ -4,49 +4,88 @@
 
 :root {
   font-family: Inter, system-ui, sans-serif;
-}
-
-html {
-  scroll-behavior: smooth;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
   text-rendering: optimizelegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  margin: 0;
-  line-height: 1.5;
-  overflow-x: hidden;
-}
-
 body.ecard-page-active {
-  padding-bottom: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 100vh !important;
+  background: none !important;
+  overflow-x: hidden !important;
 }
 
-body.ecard-page-active #app-shell {
-  width: 100%;
-  max-width: none;
-  box-shadow: none;
-  background: transparent;
-  border-radius: 0;
-  margin: 0;
-  min-height: 100vh;
-  position: relative;
-  overflow-x: clip;
+body.ecard-page-active #app {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  width: 100% !important;
+  min-height: 100vh !important;
 }
 
 #page-content {
-  will-change: transform;
-  touch-action: pan-y;
   width: 100%;
-  min-height: 80vh;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  will-change: transform;
+}
+
+#page-content > * {
+  touch-action: pan-y;
 }
 
 @keyframes bounceY {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
     transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-y {
+  animation: bounceY 0.6s ease-in-out infinite;
+}
+
+@keyframes floatHeart {
+  0% {
+    transform: translateY(0) scale(0.9) rotate(-6deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.25;
+  }
+  80% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(-92vh) scale(1.15) rotate(8deg);
+    opacity: 0;
+  }
+}
+
+.animate-float-heart {
+  animation-name: floatHeart;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bounce-y,
+  .animate-float-heart,
+  .animate-spin-slow,
+  .animate-wiggle-x {
+    animation: none !important;
   }
 }

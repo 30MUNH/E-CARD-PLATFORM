@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart } from 'lucide-react';
+import { CalendarHeart, Heart } from 'lucide-react';
 import { EcardPreloadData, resolveImageUrl, SlideDefinition } from '../data/ecardData';
 import { FloatingNavButtons } from './FloatingNavButtons';
 
@@ -9,6 +9,7 @@ interface HomepageViewProps {
   handleCardChange: (slideId: SlideDefinition['id']) => void;
   preloadedData: EcardPreloadData;
   onNext: () => void;
+  hasTimeline?: boolean;
 }
 
 export const HomepageView: React.FC<HomepageViewProps> = ({
@@ -16,107 +17,140 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
   handleCardChange,
   preloadedData,
   onNext,
+  hasTimeline = false,
 }) => {
   return (
-    <div className="p-4 w-full max-w-full sm:max-w-sm sm:mx-auto">
-      <div className="w-full px-4 pb-4">
-        <button
-          onClick={() => handleCardChange('album')}
-          className="w-full aspect-square rounded-xl overflow-hidden"
-        >
-          <img
-            src={resolveImageUrl(preloadedData.homepageData.homepage_image)}
-            alt="big"
-            className="w-full h-full object-cover rounded-xl"
-          />
-        </button>
-        <div className="mt-4 flex justify-between gap-4 justify-start">
+    <div className="p-4 md:p-8 lg:p-10 w-full max-w-full sm:max-w-sm md:max-w-2xl lg:max-w-5xl sm:mx-auto">
+      <div className="lg:grid lg:grid-cols-12 lg:gap-10 lg:items-center lg:bg-white/75 lg:backdrop-blur-md lg:rounded-3xl lg:p-8 lg:shadow-xl lg:border lg:border-rose-100">
+        {/* Left Column on Desktop: Hero Couple Photo + Shortcut Icons */}
+        <div className="w-full px-4 pb-4 lg:px-0 lg:pb-0 lg:col-span-6">
           <button
-            onClick={() => handleCardChange('music')}
-            className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex items-center justify-center"
+            onClick={() => handleCardChange('album')}
+            className="w-full aspect-square md:aspect-[4/3] lg:aspect-square rounded-xl md:rounded-2xl overflow-hidden md:shadow-lg group relative"
           >
             <img
-              src="/template/icon_music.png"
-              alt="music"
-              className="w-full h-full object-contain"
+              src={resolveImageUrl(preloadedData.homepageData.homepage_image)}
+              alt="big"
+              className="w-full h-full object-cover rounded-xl md:rounded-2xl group-hover:scale-[1.02] transition-transform duration-500"
             />
           </button>
-          <button
-            onClick={() => handleCardChange('letter')}
-            className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex items-center justify-center"
-          >
-            <img
-              src="/template/icon_letter.png"
-              alt="letter"
-              className="w-full h-full object-contain"
-            />
-            <span className="absolute top-3 right-0 translate-x-1/4 -translate-y-1/4 bg-red-600 text-white text-lg w-7 h-7 flex items-center justify-center rounded-full font-bold shadow-md">
-              1
-            </span>
-          </button>
-          {preloadedData.hasVideo && (
+          <div className="mt-4 flex justify-between gap-4 justify-start md:justify-center lg:justify-start">
             <button
-              onClick={() => handleCardChange('video')}
-              className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex items-center justify-center"
+              onClick={() => handleCardChange('music')}
+              className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex items-center justify-center md:bg-white/70 md:shadow-sm md:hover:scale-105 transition"
+              title="Nghe nhạc kỷ niệm"
             >
               <img
-                src="/template/icon_video.png"
-                alt="video"
+                src="/template/icon_music.png"
+                alt="music"
                 className="w-full h-full object-contain"
               />
             </button>
-          )}
-        </div>
-      </div>
-
-      {preloadedData.ecardData.template_id !== 'b8770825-3bb7-47af-aff1-1d4aa17975d9' && (
-        <div className="px-4 pb-4 mt-auto">
-          <div className="flex items-center justify-between bg-[#e4e3e4] rounded-2xl py-3 px-4">
-            <div className="flex flex-col items-center">
+            <button
+              onClick={() => handleCardChange('letter')}
+              className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex items-center justify-center md:bg-white/70 md:shadow-sm md:hover:scale-105 transition"
+              title="Đọc thư tình"
+            >
               <img
-                src={resolveImageUrl(preloadedData.homepageData.avatar_female)}
-                className="w-20 h-20 rounded-full object-cover mb-1 animate-spin-slow"
-                alt="avatar-1"
+                src="/template/icon_letter.png"
+                alt="letter"
+                className="w-full h-full object-contain"
               />
-              <p
-                className="text-[#A33149] text-lg font-bold"
-                style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
+              <span className="absolute top-3 right-0 translate-x-1/4 -translate-y-1/4 bg-red-600 text-white text-lg w-7 h-7 flex items-center justify-center rounded-full font-bold shadow-md">
+                1
+              </span>
+            </button>
+            {preloadedData.hasVideo && (
+              <button
+                onClick={() => handleCardChange('video')}
+                className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex items-center justify-center md:bg-white/70 md:shadow-sm md:hover:scale-105 transition"
+                title="Xem video kỷ niệm"
               >
-                {preloadedData.ecardData.female_name}
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center justify-center text-center">
-              <Heart
-                className="w-10 h-10 animate-[pulse_1s_ease-in-out_infinite]"
-                fill="#FF0000"
-                style={{ stroke: '#e4e3e4', strokeWidth: 2 }}
-              />
-              <div className="text-[#A33149] text-3xl font-bold">{loveDays}</div>
-              <div
-                className="text-[#A33149] text-sm font-medium"
-                style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
+                <img
+                  src="/template/icon_video.png"
+                  alt="video"
+                  className="w-full h-full object-contain"
+                />
+              </button>
+            )}
+            {hasTimeline && (
+              <button
+                onClick={() => handleCardChange('timeline')}
+                className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex flex-col items-center justify-center bg-white/80 text-[#A33149] shadow-sm hover:scale-105 transition"
+                title="Cột mốc tình yêu"
               >
-                ngày
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <img
-                src={resolveImageUrl(preloadedData.homepageData.avatar_male)}
-                className="w-20 h-20 rounded-full object-cover mb-1 animate-spin-slow"
-                alt="avatar-2"
-              />
-              <p
-                className="text-[#A33149] text-lg font-bold"
-                style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
-              >
-                {preloadedData.ecardData.male_name}
-              </p>
-            </div>
+                <CalendarHeart className="w-9 h-9 mb-1" />
+                <span className="text-xs font-semibold">Cột mốc</span>
+              </button>
+            )}
           </div>
         </div>
-      )}
+
+        {/* Right Column on Desktop: Couple Names & Live Love Counter */}
+        {preloadedData.ecardData.template_id !== 'b8770825-3bb7-47af-aff1-1d4aa17975d9' && (
+          <div className="px-4 pb-4 mt-auto lg:px-0 lg:pb-0 lg:mt-0 lg:col-span-6 flex flex-col justify-center">
+            <div className="hidden lg:block mb-6 text-left">
+              <span className="inline-block px-3 py-1 rounded-full bg-rose-100 text-[#A33149] text-xs font-semibold tracking-wider uppercase mb-2">
+                Lưu giữ kỷ niệm
+              </span>
+              <h1
+                className="text-3xl xl:text-4xl text-[#A33149] leading-snug"
+                style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
+              >
+                {preloadedData.ecardData.female_name} &amp; {preloadedData.ecardData.male_name}
+              </h1>
+              {preloadedData.homepageData.tagline && (
+                <p className="text-sm text-gray-600 mt-1">{preloadedData.homepageData.tagline}</p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between bg-[#e4e3e4] md:bg-[#f2e8eb] rounded-2xl py-3 px-4 md:py-6 md:px-8 md:shadow-md">
+              <div className="flex flex-col items-center">
+                <img
+                  src={resolveImageUrl(preloadedData.homepageData.avatar_female)}
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover mb-1 animate-spin-slow motion-reduce:animate-none"
+                  alt="avatar-1"
+                />
+                <p
+                  className="text-[#A33149] text-lg md:text-xl font-bold"
+                  style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
+                >
+                  {preloadedData.ecardData.female_name}
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center justify-center text-center">
+                <Heart
+                  className="w-10 h-10 md:w-12 md:h-12 animate-[pulse_1s_ease-in-out_infinite] motion-reduce:animate-none"
+                  fill="#FF0000"
+                  style={{ stroke: '#e4e3e4', strokeWidth: 2 }}
+                />
+                <div className="text-[#A33149] text-3xl md:text-4xl font-bold">{loveDays}</div>
+                <div
+                  className="text-[#A33149] text-sm md:text-base font-medium"
+                  style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
+                >
+                  ngày
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center">
+                <img
+                  src={resolveImageUrl(preloadedData.homepageData.avatar_male)}
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover mb-1 animate-spin-slow motion-reduce:animate-none"
+                  alt="avatar-2"
+                />
+                <p
+                  className="text-[#A33149] text-lg md:text-xl font-bold"
+                  style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
+                >
+                  {preloadedData.ecardData.male_name}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       <FloatingNavButtons onNext={onNext} bottomOffsetClass="bottom-[5vh]" />
     </div>

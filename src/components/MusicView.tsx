@@ -26,6 +26,7 @@ export const MusicView: React.FC<MusicViewProps> = ({
 }) => {
   const { pauseBackgroundMusic, resumeBackgroundMusic, isBackgroundMusicPlaying } = useMedia();
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
+  const htmlAudioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -34,18 +35,38 @@ export const MusicView: React.FC<MusicViewProps> = ({
   const pausedByVisibilityRef = useRef(false);
   const manualPauseRef = useRef(false);
 
+  const musicItem = Array.isArray(preloadedData.musicData)
+    ? preloadedData.musicData[0]
+    : preloadedData.musicData;
+
+  const hasCustomAudio = Boolean(musicItem?.audio_url);
+
+  useEffect(() => {
+    if (hasCustomAudio) {
+      setIsReady(true);
+    }
+  }, [hasCustomAudio]);
+
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         if (isPlaying) {
           pausedByVisibilityRef.current = true;
           manualPauseRef.current = false;
-          player?.pauseVideo();
+          if (hasCustomAudio) {
+            htmlAudioRef.current?.pause();
+          } else {
+            player?.pauseVideo();
+          }
           setIsPlaying(false);
         }
       } else if (pausedByVisibilityRef.current && !manualPauseRef.current) {
         setTimeout(() => {
-          player?.playVideo();
+          if (hasCustomAudio) {
+            void htmlAudioRef.current?.play();
+          } else {
+            player?.playVideo();
+          }
           setIsPlaying(true);
           pausedByVisibilityRef.current = false;
         }, 300);
@@ -54,7 +75,7 @@ export const MusicView: React.FC<MusicViewProps> = ({
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [player, isPlaying]);
+  }, [player, isPlaying, hasCustomAudio]);
 
   useEffect(() => {
     return () => {
@@ -69,7 +90,11 @@ export const MusicView: React.FC<MusicViewProps> = ({
 
   useEffect(() => {
     const handleStopMusic = () => {
-      if (player) {
+      if (hasCustomAudio && htmlAudioRef.current) {
+        manualPauseRef.current = true;
+        htmlAudioRef.current.pause();
+        setIsPlaying(false);
+      } else if (player) {
         manualPauseRef.current = true;
         player.pauseVideo();
         setIsPlaying(false);
@@ -82,7 +107,7 @@ export const MusicView: React.FC<MusicViewProps> = ({
 
     window.addEventListener('stop-music', handleStopMusic);
     return () => window.removeEventListener('stop-music', handleStopMusic);
-  }, [player, resumeBackgroundMusic]);
+  }, [player, resumeBackgroundMusic, hasCustomAudio]);
 
   const handleReady = (event: YouTubeEvent) => {
     setPlayer(event.target);
@@ -116,6 +141,28 @@ export const MusicView: React.FC<MusicViewProps> = ({
   };
 
   const togglePlayPause = () => {
+    if (hasCustomAudio && htmlAudioRef.current) {
+      const audio = htmlAudioRef.current;
+      if (!audio.paused) {
+        manualPauseRef.current = true;
+        audio.pause();
+        setIsPlaying(false);
+        if (pausedBgMusic) {
+          resumeBackgroundMusic();
+          setPausedBgMusic(false);
+        }
+      } else {
+        manualPauseRef.current = false;
+        if (isBackgroundMusicPlaying) {
+          setPausedBgMusic(true);
+          pauseBackgroundMusic();
+        }
+        void audio.play();
+        setIsPlaying(true);
+      }
+      return;
+    }
+
     if (!player) return;
     try {
       if (player.getPlayerState() === 1) {
@@ -146,6 +193,12 @@ export const MusicView: React.FC<MusicViewProps> = ({
   };
 
   const skipForward = () => {
+    if (hasCustomAudio && htmlAudioRef.current) {
+      const audio = htmlAudioRef.current;
+      audio.currentTime = Math.min(audio.currentTime + 5, audio.duration || 0);
+      setCurrentTime(audio.currentTime);
+      return;
+    }
     if (!player) return;
     try {
       const cur = player.getCurrentTime();
@@ -159,6 +212,12 @@ export const MusicView: React.FC<MusicViewProps> = ({
   };
 
   const skipBackward = () => {
+    if (hasCustomAudio && htmlAudioRef.current) {
+      const audio = htmlAudioRef.current;
+      audio.currentTime = Math.max(audio.currentTime - 5, 0);
+      setCurrentTime(audio.currentTime);
+      return;
+    }
     if (!player) return;
     try {
       const cur = player.getCurrentTime();
@@ -171,7 +230,7 @@ export const MusicView: React.FC<MusicViewProps> = ({
   };
 
   useEffect(() => {
-    if (!player) return;
+    if (!player || hasCustomAudio) return;
     const interval = setInterval(() => {
       try {
         const cur = player.getCurrentTime();
@@ -183,13 +242,9 @@ export const MusicView: React.FC<MusicViewProps> = ({
       }
     }, 500);
     return () => clearInterval(interval);
-  }, [player]);
+  }, [player, hasCustomAudio]);
 
-  const musicItem = Array.isArray(preloadedData.musicData)
-    ? preloadedData.musicData[0]
-    : preloadedData.musicData;
-
-  if (!musicItem || !musicItem.youtube_id) {
+  if (!musicItem || (!musicItem.youtube_id && !musicItem.audio_url)) {
     return (
       <div className="p-4 w-full max-w-sm mx-auto text-center text-gray-500">
         Không có nhạc để phát
@@ -198,112 +253,134 @@ export const MusicView: React.FC<MusicViewProps> = ({
   }
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const artistLabel = musicItem.artist || 'Duni';
+  const quoteLabel = musicItem.quote || 'Love you to the saturn and back';
 
   return (
-    <div className="p-4 w-full max-w-sm mx-auto">
-      <YouTube
-        videoId={musicItem.youtube_id}
-        onReady={handleReady}
-        onStateChange={handleStateChange}
-        style={{ height: '1px' }}
-        opts={{
-          height: '1',
-          width: '1',
-          playerVars: {
-            autoplay: 0,
-            playsinline: 1,
-            controls: 0,
-            modestbranding: 1,
-            rel: 0,
-            showinfo: 0,
-            mute: 0,
-            origin: typeof window !== 'undefined' ? window.location.origin : undefined,
-            start: 1,
-          },
-        }}
-      />
+    <div className="p-4 md:p-8 w-full max-w-sm md:max-w-2xl lg:max-w-3xl mx-auto">
+      {hasCustomAudio && musicItem.audio_url ? (
+        <audio
+          ref={htmlAudioRef}
+          src={musicItem.audio_url}
+          onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+          onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime || 0)}
+          onEnded={() => setIsPlaying(false)}
+          className="hidden"
+        />
+      ) : (
+        <YouTube
+          videoId={musicItem.youtube_id}
+          onReady={handleReady}
+          onStateChange={handleStateChange}
+          style={{ height: '1px' }}
+          opts={{
+            height: '1',
+            width: '1',
+            playerVars: {
+              autoplay: 0,
+              playsinline: 1,
+              controls: 0,
+              modestbranding: 1,
+              rel: 0,
+              showinfo: 0,
+              mute: 0,
+              origin: typeof window !== 'undefined' ? window.location.origin : undefined,
+              start: 1,
+            },
+          }}
+        />
+      )}
 
-      <div className="bg-[#8c5261] rounded-xl p-4 relative">
-        <div className="rounded-xl aspect-square overflow-hidden mb-4">
+      <div className="bg-[#8c5261] rounded-xl md:rounded-3xl p-4 md:p-8 relative md:shadow-2xl md:grid md:grid-cols-12 md:gap-8 md:items-center">
+        <div className="rounded-xl md:rounded-2xl aspect-square overflow-hidden mb-4 md:mb-0 md:col-span-5 md:shadow-lg">
           <img
             src={resolveImageUrl(musicItem.image_url || '')}
             alt="cover"
-            className="w-full object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
 
-        <div className="flex flex-col text-left  text-[#c4a5ab]">
-          <div className="text-sm  ">Duni</div>
-          <div
-            className="text-2xl text-white py-2"
-            style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
-          >
-            {musicItem.title || ''}
+        <div className="md:col-span-7 flex flex-col justify-center">
+          <div className="flex flex-col text-left text-[#c4a5ab]">
+            <div className="text-sm md:text-base">{artistLabel}</div>
+            <div
+              className="text-2xl md:text-3xl lg:text-4xl text-white py-2"
+              style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
+            >
+              {musicItem.title || ''}
+            </div>
+            <div className="text-sm md:text-base mb-2">{quoteLabel}</div>
           </div>
-          <div className="text-sm mb-2">Love you to the saturn and back</div>
-        </div>
 
-        <div className="flex items-center text-sm text-white gap-2 mt-4">
-          <span className="min-w-[40px] text-left">{formatTime(currentTime)}</span>
-          <div
-            className="relative w-full h-2 bg-[#b18392] rounded-full overflow-hidden cursor-pointer"
-            onClick={(e) => {
-              if (!player || !duration) return;
-              try {
+          <div className="flex items-center text-sm text-white gap-2 mt-4">
+            <span className="min-w-[40px] text-left">{formatTime(currentTime)}</span>
+            <div
+              className="relative w-full h-2 bg-[#b18392] rounded-full overflow-hidden cursor-pointer"
+              onClick={(e) => {
+                if (!duration) return;
                 const rect = e.currentTarget.getBoundingClientRect();
                 const targetTime = ((e.clientX - rect.left) / rect.width) * duration;
-                player.seekTo(targetTime, true);
-                setCurrentTime(targetTime);
-              } catch (err) {
-                console.error('Error seeking:', err);
-              }
-            }}
-          >
-            <div
-              className="absolute top-0 left-0 h-full bg-white"
-              style={{ width: `${progressPercent}%` }}
-            />
+                if (hasCustomAudio && htmlAudioRef.current) {
+                  htmlAudioRef.current.currentTime = targetTime;
+                  setCurrentTime(targetTime);
+                  return;
+                }
+                if (!player) return;
+                try {
+                  player.seekTo(targetTime, true);
+                  setCurrentTime(targetTime);
+                } catch (err) {
+                  console.error('Error seeking:', err);
+                }
+              }}
+            >
+              <div
+                className="absolute top-0 left-0 h-full bg-white"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <span className="min-w-[40px] text-right">{formatTime(duration - currentTime)}</span>
           </div>
-          <span className="min-w-[40px] text-right">{formatTime(duration - currentTime)}</span>
-        </div>
 
-        <div className="flex justify-around items-center text-white text-2xl mt-4">
-          <button onClick={skipBackward}>
-            <FaBackward />
-          </button>
-          <button
-            onClick={() => {
-              if (isReady) togglePlayPause();
-            }}
-            disabled={!isReady}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition 
+          <div className="flex justify-around items-center text-white text-2xl mt-4 md:mt-6">
+            <button type="button" onClick={skipBackward}>
+              <FaBackward />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (isReady) togglePlayPause();
+              }}
+              disabled={!isReady}
+              className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition 
     ${isReady ? 'bg-white text-[#8c4b5d]' : 'bg-gray-300 text-gray-500 animate-pulse'}`}
-          >
-            {isReady ? (
-              isPlaying ? (
-                <FaPause />
+            >
+              {isReady ? (
+                isPlaying ? (
+                  <FaPause />
+                ) : (
+                  <FaPlay className="w-5 h-5 relative left-[2px]" />
+                )
               ) : (
-                <FaPlay className="w-5 h-5 relative left-[2px]" />
-              )
-            ) : (
-              <svg
-                className="animate-spin h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <circle className="opacity-25" cx="12" cy="12" r="10" strokeWidth="4" />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                />
-              </svg>
-            )}
-          </button>
-          <button onClick={skipForward}>
-            <FaForward />
-          </button>
+                <svg
+                  className="animate-spin h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <circle className="opacity-25" cx="12" cy="12" r="10" strokeWidth="4" />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
+                </svg>
+              )}
+            </button>
+            <button type="button" onClick={skipForward}>
+              <FaForward />
+            </button>
+          </div>
         </div>
       </div>
 
