@@ -1,0 +1,317 @@
+import React, { useEffect, useRef, useState } from 'react';
+import YouTube, { YouTubeEvent, YouTubePlayer } from 'react-youtube';
+import { FaBackward, FaForward, FaPause, FaPlay } from 'react-icons/fa';
+import { useMedia } from '../context/MediaContext';
+import { EcardPreloadData, resolveImageUrl } from '../data/ecardData';
+import { FloatingNavButtons } from './FloatingNavButtons';
+
+interface MusicViewProps {
+  ecardId: string;
+  preloadedData: EcardPreloadData;
+  onBack: () => void;
+  onNext: () => void;
+}
+
+function formatTime(seconds: number): string {
+  const safeSeconds = Number.isFinite(seconds) && seconds >= 0 ? seconds : 0;
+  const mins = Math.floor(safeSeconds / 60);
+  const secs = Math.floor(safeSeconds % 60);
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+export const MusicView: React.FC<MusicViewProps> = ({
+  preloadedData,
+  onBack,
+  onNext,
+}) => {
+  const { pauseBackgroundMusic, resumeBackgroundMusic, isBackgroundMusicPlaying } = useMedia();
+  const [player, setPlayer] = useState<YouTubePlayer | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isReady, setIsReady] = useState(false);
+  const [pausedBgMusic, setPausedBgMusic] = useState(false);
+  const pausedByVisibilityRef = useRef(false);
+  const manualPauseRef = useRef(false);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (isPlaying) {
+          pausedByVisibilityRef.current = true;
+          manualPauseRef.current = false;
+          player?.pauseVideo();
+          setIsPlaying(false);
+        }
+      } else if (pausedByVisibilityRef.current && !manualPauseRef.current) {
+        setTimeout(() => {
+          player?.playVideo();
+          setIsPlaying(true);
+          pausedByVisibilityRef.current = false;
+        }, 300);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [player, isPlaying]);
+
+  useEffect(() => {
+    return () => {
+      if (pausedBgMusic) {
+        setTimeout(() => {
+          resumeBackgroundMusic();
+          setPausedBgMusic(false);
+        }, 300);
+      }
+    };
+  }, [pausedBgMusic, resumeBackgroundMusic]);
+
+  useEffect(() => {
+    const handleStopMusic = () => {
+      if (player) {
+        manualPauseRef.current = true;
+        player.pauseVideo();
+        setIsPlaying(false);
+      }
+      setTimeout(() => {
+        resumeBackgroundMusic();
+        setPausedBgMusic(false);
+      }, 300);
+    };
+
+    window.addEventListener('stop-music', handleStopMusic);
+    return () => window.removeEventListener('stop-music', handleStopMusic);
+  }, [player, resumeBackgroundMusic]);
+
+  const handleReady = (event: YouTubeEvent) => {
+    setPlayer(event.target);
+    setIsReady(true);
+  };
+
+  const handleStateChange = (event: YouTubeEvent<number>) => {
+    if (event.data === 1) {
+      if (isBackgroundMusicPlaying) {
+        setPausedBgMusic(true);
+        pauseBackgroundMusic();
+      }
+      setIsPlaying(true);
+    } else if (event.data === 2) {
+      if (pausedBgMusic && !manualPauseRef.current) {
+        setTimeout(() => {
+          resumeBackgroundMusic();
+          setPausedBgMusic(false);
+        }, 300);
+      }
+      setIsPlaying(false);
+    } else if (event.data === 0) {
+      if (pausedBgMusic) {
+        setTimeout(() => {
+          resumeBackgroundMusic();
+          setPausedBgMusic(false);
+        }, 300);
+      }
+      setIsPlaying(false);
+    }
+  };
+
+  const togglePlayPause = () => {
+    if (!player) return;
+    try {
+      if (player.getPlayerState() === 1) {
+        manualPauseRef.current = true;
+        player.pauseVideo();
+        setIsPlaying(false);
+        if (pausedBgMusic) {
+          setTimeout(() => {
+            resumeBackgroundMusic();
+            setPausedBgMusic(false);
+          }, 300);
+        }
+      } else {
+        manualPauseRef.current = false;
+        if (isBackgroundMusicPlaying) {
+          setPausedBgMusic(true);
+          pauseBackgroundMusic();
+        }
+        if (navigator.userAgent.toLowerCase().includes('zalo')) {
+          player.unMute();
+        }
+        player.playVideo();
+        setIsPlaying(true);
+      }
+    } catch (err) {
+      console.error('Error controlling YouTube player:', err);
+    }
+  };
+
+  const skipForward = () => {
+    if (!player) return;
+    try {
+      const cur = player.getCurrentTime();
+      const dur = player.getDuration();
+      const next = Math.min(cur + 5, dur);
+      player.seekTo(next, true);
+      setCurrentTime(next);
+    } catch (err) {
+      console.error('Error skipping forward:', err);
+    }
+  };
+
+  const skipBackward = () => {
+    if (!player) return;
+    try {
+      const cur = player.getCurrentTime();
+      const next = Math.max(cur - 5, 0);
+      player.seekTo(next, true);
+      setCurrentTime(next);
+    } catch (err) {
+      console.error('Error skipping backward:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (!player) return;
+    const interval = setInterval(() => {
+      try {
+        const cur = player.getCurrentTime();
+        const dur = player.getDuration();
+        setCurrentTime(cur || 0);
+        setDuration(dur || 0);
+      } catch (err) {
+        console.error('Error updating progress:', err);
+      }
+    }, 500);
+    return () => clearInterval(interval);
+  }, [player]);
+
+  const musicItem = Array.isArray(preloadedData.musicData)
+    ? preloadedData.musicData[0]
+    : preloadedData.musicData;
+
+  if (!musicItem || !musicItem.youtube_id) {
+    return (
+      <div className="p-4 w-full max-w-sm mx-auto text-center text-gray-500">
+        Không có nhạc để phát
+      </div>
+    );
+  }
+
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  return (
+    <div className="p-4 w-full max-w-sm mx-auto">
+      <YouTube
+        videoId={musicItem.youtube_id}
+        onReady={handleReady}
+        onStateChange={handleStateChange}
+        style={{ height: '1px' }}
+        opts={{
+          height: '1',
+          width: '1',
+          playerVars: {
+            autoplay: 0,
+            playsinline: 1,
+            controls: 0,
+            modestbranding: 1,
+            rel: 0,
+            showinfo: 0,
+            mute: 0,
+            origin: typeof window !== 'undefined' ? window.location.origin : undefined,
+            start: 1,
+          },
+        }}
+      />
+
+      <div className="bg-[#8c5261] rounded-xl p-4 relative">
+        <div className="rounded-xl aspect-square overflow-hidden mb-4">
+          <img
+            src={resolveImageUrl(musicItem.image_url || '')}
+            alt="cover"
+            className="w-full object-cover"
+          />
+        </div>
+
+        <div className="flex flex-col text-left  text-[#c4a5ab]">
+          <div className="text-sm  ">Duni</div>
+          <div
+            className="text-2xl text-white py-2"
+            style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
+          >
+            {musicItem.title || ''}
+          </div>
+          <div className="text-sm mb-2">Love you to the saturn and back</div>
+        </div>
+
+        <div className="flex items-center text-sm text-white gap-2 mt-4">
+          <span className="min-w-[40px] text-left">{formatTime(currentTime)}</span>
+          <div
+            className="relative w-full h-2 bg-[#b18392] rounded-full overflow-hidden cursor-pointer"
+            onClick={(e) => {
+              if (!player || !duration) return;
+              try {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const targetTime = ((e.clientX - rect.left) / rect.width) * duration;
+                player.seekTo(targetTime, true);
+                setCurrentTime(targetTime);
+              } catch (err) {
+                console.error('Error seeking:', err);
+              }
+            }}
+          >
+            <div
+              className="absolute top-0 left-0 h-full bg-white"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <span className="min-w-[40px] text-right">{formatTime(duration - currentTime)}</span>
+        </div>
+
+        <div className="flex justify-around items-center text-white text-2xl mt-4">
+          <button onClick={skipBackward}>
+            <FaBackward />
+          </button>
+          <button
+            onClick={() => {
+              if (isReady) togglePlayPause();
+            }}
+            disabled={!isReady}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition 
+    ${isReady ? 'bg-white text-[#8c4b5d]' : 'bg-gray-300 text-gray-500 animate-pulse'}`}
+          >
+            {isReady ? (
+              isPlaying ? (
+                <FaPause />
+              ) : (
+                <FaPlay className="w-5 h-5 relative left-[2px]" />
+              )
+            ) : (
+              <svg
+                className="animate-spin h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <circle className="opacity-25" cx="12" cy="12" r="10" strokeWidth="4" />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+            )}
+          </button>
+          <button onClick={skipForward}>
+            <FaForward />
+          </button>
+        </div>
+      </div>
+
+      <FloatingNavButtons
+        onBack={onBack}
+        onNext={onNext}
+        bottomOffsetClass="bottom-[8vh]"
+      />
+    </div>
+  );
+};
