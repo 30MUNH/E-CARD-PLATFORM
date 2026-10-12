@@ -21,12 +21,12 @@
 ### Task Breakdown
 
 - [x] **Task 1: Git Initialization & Branch Setup** (`.gitignore`, `main` baseline commit, `feat/ecard-platform-frontend` branch)
-- [ ] **Task 2: Frontend/Backend Contract (`docs/frontend-backend-contract.md`), Versioned `EcardConfig` Schema & Service Interfaces/Mocks**
-- [ ] **Task 3: `EcardRenderer` — Configuration-Driven Recipient Experience & Special Dates / Timeline View**
-- [ ] **Task 4: PIN Screen — Unlimited Immediate Retries & Injectable Verification Service**
-- [ ] **Task 5: Recipient Experience — Responsive Tablet (`768×1024`) & Desktop (`1440×900`) Redesign (Preserving Mobile `390×844`)**
-- [ ] **Task 6: Admin Layout Shell & Dashboard Overview (`/admin`)**
-- [ ] **Task 7: E-Card Management List (`/admin/cards`) & Multi-Section Card Editor (`/admin/cards/new`, `/admin/cards/:id/edit`)**
-- [ ] **Task 8: Interactive Live Preview (`/admin/cards/:id/preview`) with Viewport Switcher & Preserved Form State**
-- [ ] **Task 9: Automated Playwright E2E Suite Expansion & Multi-Viewport Screenshot Capture**
-- [ ] **Task 10: Final Documentation (`docs/FRONTEND_ARCHITECTURE.md`, `docs/UI_UX_IMPLEMENTATION_REPORT.md`) & Full QA Verification**
+- [x] **Task 2: Frontend/Backend Contract (`docs/frontend-backend-contract.md`), Versioned `EcardConfig` Schema & Service Interfaces/Mocks**
+- [x] **Task 3: `EcardRenderer` — Configuration-Driven Recipient Experience & Special Dates / Timeline View**
+- [x] **Task 4: PIN Screen — Unlimited Immediate Retries & Injectable Verification Service**
+- [x] **Task 5: Recipient Experience — Responsive Tablet (`768×1024`) & Desktop (`1440×900`) Redesign (Preserving Mobile `390×844`)**
+- [x] **Task 6: Admin Layout Shell & Dashboard Overview (`/admin`)**
+- [x] **Task 7: E-Card Management List (`/admin/cards`) & Multi-Section Card Editor (`/admin/cards/new`, `/admin/cards/:id/edit`)**
+- [x] **Task 8: Interactive Live Preview (`/admin/cards/:id/preview`) with Viewport Switcher & Preserved Form State**
+- [x] **Task 9: Automated Playwright E2E Suite Expansion & Multi-Viewport Screenshot Capture**
+- [x] **Task 10: Final Documentation (`docs/FRONTEND_ARCHITECTURE.md`, `docs/UI_UX_IMPLEMENTATION_REPORT.md`) & Full QA Verification**

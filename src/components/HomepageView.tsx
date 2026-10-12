@@ -93,12 +93,12 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
               <span className="inline-block px-3 py-1 rounded-full bg-rose-100 text-[#A33149] text-xs font-semibold tracking-wider uppercase mb-2">
                 Lưu giữ kỷ niệm
               </span>
-              <h1
+              <h2
                 className="text-3xl xl:text-4xl text-[#A33149] leading-snug"
                 style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
               >
-                {preloadedData.ecardData.female_name} &amp; {preloadedData.ecardData.male_name}
-              </h1>
+                Hành trình yêu thương
+              </h2>
               {preloadedData.homepageData.tagline && (
                 <p className="text-sm text-gray-600 mt-1">{preloadedData.homepageData.tagline}</p>
               )}

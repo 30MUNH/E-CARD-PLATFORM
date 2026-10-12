@@ -105,13 +105,11 @@ const SlideStageContent: React.FC<SlideStageContentProps> = ({ onVerifyRedirectS
         onTouchStart={playTapSound}
       />
 
-      {/* Tablet & Desktop Floating Couple Header & Slide Progress Dots */}
+      {/* Tablet & Desktop Floating Header & Slide Progress Dots */}
       <div className="hidden md:flex items-center justify-between px-16 pt-4 pb-2 z-30 pointer-events-none">
         <div className="pointer-events-auto inline-flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full shadow-sm border border-rose-100 text-sm font-semibold text-[#A33149]">
           <Heart className="w-4 h-4 fill-[#A33149] text-[#A33149]" />
-          <span>
-            {config.ecardData.female_name} &amp; {config.ecardData.male_name}
-          </span>
+          <span>Lưu giữ kỷ niệm yêu thương</span>
         </div>
 
         <div className="pointer-events-auto flex items-center gap-2 bg-white/80 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-sm border border-rose-100">

@@ -82,7 +82,8 @@ export const CardEditorPage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [id, editingCardId, initializeNewCard, initializeFromCard]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const handleSaveDraft = async () => {
     if (!draft.title.trim()) {
