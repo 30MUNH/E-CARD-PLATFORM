@@ -1,73 +1,33 @@
-export interface EcardMetadata {
-  id: string;
-  female_name: string;
-  male_name: string;
-  love_start_date: string;
-  has_pin: boolean;
-  template_id: string;
-  owner_name: string | null;
-  owner_phone: string | null;
-  owner_addr: string | null;
-  owner_maps: string | null;
-}
+import {
+  AlbumItem,
+  EcardConfig,
+  EcardMetadata,
+  EcardPreloadData,
+  ECARD_SCHEMA_VERSION,
+  HomepageData,
+  LetterData,
+  MusicItem,
+  SlideDefinition,
+  SlideId,
+  SpecialDateMilestone,
+  TemplateDefinition,
+  ThemeCustomization,
+} from '../types/ecard';
 
-export interface HomepageData {
-  avatar_female: string;
-  avatar_male: string;
-  homepage_image: string;
-}
-
-export interface AlbumItem {
-  id: string;
-  ecard_id: string;
-  image_url: string;
-  caption: string;
-}
-
-export interface LetterData {
-  love_letters: string[];
-  audio_url: string | null;
-  avatars: string[];
-}
-
-export interface MusicItem {
-  id: string;
-  ecard_id: string;
-  youtube_id: string;
-  title: string;
-  created_at: string;
-  updated_at: string | null;
-  image_url: string;
-  caption: string | null;
-  is_deleted: boolean;
-  deleted_at: string | null;
-}
-
-export interface EcardPreloadData {
-  ecardData: EcardMetadata;
-  homepageData: HomepageData;
-  albumData: AlbumItem[];
-  provinceImages: string[];
-  letterData: LetterData;
-  musicData: MusicItem[];
-  hasVoice: boolean;
-  hasVideo: boolean;
-  videoData: {
-    video_url: string | null;
-  };
-  injectionData: unknown[];
-  wishboxData: unknown[];
-}
-
-export interface SlideDefinition {
-  id: 'homepage' | 'album' | 'music' | 'letter' | 'game' | 'video' | 'setting';
-  title: string;
-  content?: string;
-  bgColor?: string;
-  textColor?: string;
-  images?: string[];
-  backgroundImage?: string;
-}
+export type {
+  AlbumItem,
+  EcardConfig,
+  EcardMetadata,
+  EcardPreloadData,
+  HomepageData,
+  LetterData,
+  MusicItem,
+  SlideDefinition,
+  SlideId,
+  SpecialDateMilestone,
+  TemplateDefinition,
+  ThemeCustomization,
+};
 
 export const SLIDES: SlideDefinition[] = [
   {
@@ -101,6 +61,13 @@ export const SLIDES: SlideDefinition[] = [
     backgroundImage: '/template/background-template.jpg',
   },
   {
+    id: 'timeline',
+    title: 'Cột mốc',
+    bgColor: 'bg-white',
+    textColor: 'text-gray-800',
+    backgroundImage: '/template/background-template-2.png',
+  },
+  {
     id: 'game',
     title: 'Game',
     bgColor: 'bg-white',
@@ -120,7 +87,59 @@ export const SLIDES: SlideDefinition[] = [
   },
 ];
 
+export const DEFAULT_SLIDE_ORDER: SlideId[] = [
+  'homepage',
+  'album',
+  'music',
+  'letter',
+  'game',
+  'video',
+  'setting',
+];
+
+export const AVAILABLE_TEMPLATES: TemplateDefinition[] = [
+  {
+    id: '8fa6d2b3-ba30-4290-9ac7-7a830c23bc7a',
+    name: 'By.Duni Classic Scrapbook',
+    tagline: 'Ghi dấu kỷ niệm ngọt ngào với album ảnh, lá thư tay và bộ bài Love Drunk',
+    description:
+      'Giao diện chuẩn By.Duni với khung ảnh Polaroid, hiệu ứng máy đánh chữ lãng mạn, trình phát nhạc và trò chơi rút bài tương tác cho cặp đôi.',
+    previewImageUrl: '/template/background-welcome.png',
+    accentColor: '#A33149',
+    supportedSlides: ['homepage', 'album', 'music', 'letter', 'timeline', 'game', 'video', 'setting'],
+    isDefault: true,
+  },
+  {
+    id: 'c421e9f0-71a4-4d8e-b8c2-9102f43a11e2',
+    name: 'Editorial Rose & Ivory',
+    tagline: 'Phong cách tạp chí tinh tế cho kỷ niệm ngày cưới & cầu hôn',
+    description:
+      'Bố cục tạp chí sang trọng với tông màu hồng đất & kem ngà, tối ưu cho thư tình dài, dòng thời gian kỷ niệm và bộ sưu tập ảnh nghệ thuật.',
+    previewImageUrl: '/template/background-template.jpg',
+    accentColor: '#8c5261',
+    supportedSlides: ['homepage', 'album', 'music', 'letter', 'timeline', 'video'],
+  },
+  {
+    id: 'f910b3a8-19c2-43d1-901a-55b8210ce490',
+    name: 'Minimalist Sweetheart',
+    tagline: 'Tối giản, tập trung vào câu chuyện tình yêu và âm nhạc',
+    description:
+      'Thiết kế hiện đại tối giản dành cho các cặp đôi yêu thích sự nhẹ nhàng, tập trung vào lời nhắn gửi và giai điệu kỷ niệm.',
+    previewImageUrl: '/template/background-template-2.png',
+    accentColor: '#BB254E',
+    supportedSlides: ['homepage', 'album', 'music', 'letter', 'game'],
+  },
+];
+
 export const DEFAULT_ECARD_UUID = '8ae32098-4fc9-4787-9d79-557a03b08532';
+
+export const DEFAULT_THEME_CUSTOMIZATION: ThemeCustomization = {
+  primaryColor: '#A33149',
+  accentColor: '#8c5261',
+  backgroundTint: '#FFE4E4',
+  enableFloatingHearts: true,
+  enableSoundEffects: true,
+};
 
 export const PRELOADED_ECARD_DATA: EcardPreloadData = {
   ecardData: {
@@ -211,6 +230,8 @@ export const PRELOADED_ECARD_DATA: EcardPreloadData = {
       ecard_id: '8ae32098-4fc9-4787-9d79-557a03b08532',
       youtube_id: 'JgTZvDbaTtg',
       title: 'Một Đời',
+      artist: 'Duni',
+      quote: 'Love you to the saturn and back',
       created_at: '2025-07-29T21:36:26.606Z',
       updated_at: null,
       image_url: 'https://drive.google.com/uc?id=1Bg038w05bthwBWtlOAUOTGY9sjWOl5HU',
@@ -226,11 +247,69 @@ export const PRELOADED_ECARD_DATA: EcardPreloadData = {
   },
   injectionData: [],
   wishboxData: [],
+  specialDates: [
+    {
+      id: 'ms-1',
+      date: '2025-04-30',
+      title: 'Ngày bắt đầu yêu nhau',
+      description: 'Khoảnh khắc tụi mình chính thức nắm tay nhau bước vào hành trình mới.',
+      badge: 'Kỷ niệm 1',
+    },
+    {
+      id: 'ms-2',
+      date: '2025-06-15',
+      title: 'Chuyến đi biển đầu tiên',
+      description: 'Cùng nhau ngắm hoàng hôn trên biển và lưu lại những bức hình đáng nhớ.',
+      badge: 'Chuyến đi',
+    },
+    {
+      id: 'ms-3',
+      date: '2025-08-16',
+      title: 'Sinh nhật đầu tiên bên nhau',
+      description: 'Bữa tiệc bất ngờ với chiếc bánh kem nhỏ và thật nhiều lời chúc yêu thương.',
+      badge: 'Sinh nhật',
+    },
+  ],
+  welcomeConfig: {
+    heading: 'Món quà bí mật',
+    subheading: 'Dành tặng riêng cho người đặc biệt nhất',
+    buttonLabel: 'Bắt đầu',
+    backgroundImage: '/template/background-welcome.png',
+  },
+  pinScreenConfig: {
+    heading: 'Mở khóa kỷ niệm',
+    subheading: 'Bất ngờ cho cậu nà 😜',
+    backgroundImage: '/template/background-template.jpg',
+  },
+  themeCustomization: DEFAULT_THEME_CUSTOMIZATION,
+};
+
+export const DEFAULT_ECARD_CONFIG: EcardConfig = {
+  ...PRELOADED_ECARD_DATA,
+  schemaVersion: ECARD_SCHEMA_VERSION,
+  title: 'Kỷ niệm Sinh nhật — Ngọc Khánh & Lê Hoàng Anh',
+  description: 'Thiệp kỷ niệm sinh nhật và hành trình yêu thương',
+  status: 'published',
+  createdAt: '2025-07-29T14:20:00.000Z',
+  updatedAt: '2025-08-15T09:30:00.000Z',
+  publicSlug: DEFAULT_ECARD_UUID,
+  publicUrl: `/ecd/game/${DEFAULT_ECARD_UUID}`,
+  slideOrder: ['homepage', 'album', 'music', 'letter', 'game', 'video', 'setting'],
+  slideVisibility: {
+    homepage: true,
+    album: true,
+    music: true,
+    letter: true,
+    timeline: false,
+    game: true,
+    video: false,
+    setting: true,
+  },
 };
 
 /**
  * Resolves Google Drive image URLs to local cached copies in /user-media/<id>.jpg
- * (matching https://lh3.googleusercontent.com/d/<id>=w1000 byte-for-byte).
+ * or falls back cleanly to template images if local user-media is unavailable.
  */
 export function resolveImageUrl(url: string | null | undefined): string {
   if (!url) return '';
@@ -244,11 +323,11 @@ export function resolveImageUrl(url: string | null | undefined): string {
 }
 
 /**
- * Verifies the 4-digit PIN using dual non-reversible hashes (FNV-1a & DJB2)
- * so the plaintext credential is never stored in source code, logs, or VCS.
+ * Development-only PIN check used by MockCardAccessService for E2E test compatibility.
+ * Production PIN verification must be executed server-side by OpenAI Codex.
  */
-const PIN_HASH_FNV1A = 3162167318;
-const PIN_HASH_DJB2 = 2088294964;
+const DEV_MOCK_HASH_FNV1A = 3162167318;
+const DEV_MOCK_HASH_DJB2 = 2088294964;
 
 export function verifyPinInput(candidate: string): boolean {
   if (candidate.length !== 4) return false;
@@ -260,7 +339,7 @@ export function verifyPinInput(candidate: string): boolean {
     h1 = Math.imul(h1, 16777619) >>> 0;
     h2 = ((h2 << 5) + h2 + code) >>> 0;
   }
-  return h1 === PIN_HASH_FNV1A && h2 === PIN_HASH_DJB2;
+  return h1 === DEV_MOCK_HASH_FNV1A && h2 === DEV_MOCK_HASH_DJB2;
 }
 
 export function calculateLoveDays(loveStartDate?: string): number {
