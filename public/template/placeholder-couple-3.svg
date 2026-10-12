@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF0F3"/>
+      <stop offset="100%" stop-color="#F3C1CF"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" rx="32" fill="url(#bg3)"/>
+  <rect x="130" y="110" width="340" height="290" rx="20" fill="#FFFFFF" stroke="#E5B8C5" stroke-width="3"/>
+  <path d="M300 315 C255 275 225 240 225 208 C225 182 245 162 270 162 C284 162 294 170 300 180 C306 170 316 162 330 162 C355 162 375 182 375 208 C375 240 345 275 300 315 Z" fill="#A33149"/>
+  <text x="300" y="465" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="bold" fill="#A33149">Our Love Story</text>
+  <text x="300" y="502" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#8C5261">Lưu giữ từng kỷ niệm</text>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FCEEF2"/>
+      <stop offset="100%" stop-color="#E8B4C2"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" rx="32" fill="url(#bg2)"/>
+  <circle cx="245" cy="250" r="78" fill="#FFF9FB" stroke="#A33149" stroke-width="4"/>
+  <circle cx="355" cy="250" r="78" fill="#FFF9FB" stroke="#8C5261" stroke-width="4"/>
+  <path d="M300 285 C278 265 262 248 262 230 C262 216 273 205 286 205 C293 205 298 209 300 215 C302 209 307 205 314 205 C327 205 338 216 338 230 C338 248 322 265 300 285 Z" fill="#BB254E"/>
+  <text x="300" y="440" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="bold" fill="#8C5261">Together Forever</text>
+  <text x="300" y="478" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#A33149">Khoảnh khắc yêu thương #2</text>
+</svg>
