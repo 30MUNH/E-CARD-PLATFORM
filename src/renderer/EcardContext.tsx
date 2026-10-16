@@ -27,7 +27,7 @@ export function computeActiveSlides(config: EcardConfig): SlideDefinition[] {
   const order: SlideId[] =
     config.slideOrder && config.slideOrder.length > 0
       ? config.slideOrder
-      : ['homepage', 'album', 'music', 'letter', 'game', 'video', 'setting'];
+      : ['homepage', 'album', 'music', 'letter', 'game', 'video'];
 
   const visibility = config.slideVisibility || {};
 
@@ -84,11 +84,7 @@ export const EcardProvider: React.FC<EcardProviderProps> = ({
     }
   };
 
-  // Interactive content slides exclude 'setting' when cycling Next/Prev
-  const contentSlidesCount = useMemo(() => {
-    const nonSetting = activeSlides.filter((s) => s.id !== 'setting');
-    return nonSetting.length > 0 ? nonSetting.length : activeSlides.length;
-  }, [activeSlides]);
+  const contentSlidesCount = activeSlides.length;
 
   const goNextSlide = () => {
     const nextIdx = safeIndex + 1;

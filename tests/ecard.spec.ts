@@ -149,19 +149,15 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     await sidebarBtn.click();
     await expect(page.locator('button:has-text("Trang chủ")')).toBeVisible();
     await expect(page.locator('button:has-text("Ảnh")')).toBeVisible();
-    await expect(page.locator('button:has-text("Nhạc")')).toBeVisible();
+    await expect(page.locator('button:has-text("Voice")')).toBeVisible();
     await expect(page.locator('button:has-text("Lá thư")')).toBeVisible();
     await expect(page.locator('button:has-text("Game")')).toBeVisible();
-    await expect(page.locator('button:has-text("Cài đặt")')).toBeVisible();
+    await expect(page.locator('button:has-text("Cài đặt")')).toHaveCount(0);
     await expect(page.locator('button:has-text("Video")')).toHaveCount(0);
+    await expect(page.locator('img[alt="Thẻ tình yêu"]')).toBeVisible();
 
     await page.locator('button:has-text("Game")').click();
     await expect(page.locator('text=Hướng dẫn chơi:')).toBeVisible();
-
-    await sidebarBtn.click();
-    await page.locator('button:has-text("Cài đặt")').click();
-    await expect(page).toHaveURL(/\/ecd\/signin\/8ae32098-4fc9-4787-9d79-557a03b08532/);
-    await expect(page.locator('h1:has-text("Đăng nhập/Đăng ký")')).toBeVisible();
   });
 
   test('4. Album collage layout, Lightbox modal, captions, and mobile touch swipe', async ({
@@ -271,7 +267,7 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(ECARD_PATH);
     await expect(page.locator('.bg-gray-800.rounded-\\[35px\\]')).toHaveCount(0);
-    await expect(page.locator('h1:has-text("Món quà bí mật")')).toBeVisible();
+    await expect(page.locator('button:has-text("Bắt đầu")')).toBeVisible();
 
     const desktopOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > window.innerWidth
@@ -281,16 +277,16 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     // Tablet (768x1024) renders responsive layout without horizontal overflow
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto(ECARD_PATH);
-    await expect(page.locator('h1:has-text("Món quà bí mật")')).toBeVisible();
+    await expect(page.locator('button:has-text("Bắt đầu")')).toBeVisible();
     const tabletOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > window.innerWidth
     );
     expect(tabletOverflow).toBe(false);
 
-    // Mobile (390x844) renders fullscreen without desktop invitation header or overflow
+    // Mobile (390x844) renders fullscreen without overflow
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(ECARD_PATH);
-    await expect(page.locator('h1:has-text("Món quà bí mật")')).toBeHidden();
+    await expect(page.locator('button:has-text("Bắt đầu")')).toBeVisible();
     const mobileOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > window.innerWidth
     );
@@ -397,8 +393,8 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     await page.locator('button[aria-label="Chuyển tới mục Ảnh"]').click();
     await expect(page.locator('img[alt="group1-img0"]')).toBeVisible();
 
-    // Click progress dot for Music
-    await page.locator('button[aria-label="Chuyển tới mục Nhạc"]').click();
+    // Click progress dot for Voice
+    await page.locator('button[aria-label="Chuyển tới mục Voice"]').click();
     await expect(page.locator('text=Một Đời')).toBeVisible();
   });
 });

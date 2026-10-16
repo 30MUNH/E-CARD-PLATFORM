@@ -141,7 +141,6 @@ function createEmptyDraft(): SaveCardDraftPayload {
       timeline: true,
       game: true,
       video: false,
-      setting: true,
     },
   };
 }

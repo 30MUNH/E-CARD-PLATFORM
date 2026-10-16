@@ -38,7 +38,7 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
             <button
               onClick={() => handleCardChange('music')}
               className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex items-center justify-center md:bg-white/70 md:shadow-sm md:hover:scale-105 transition"
-              title="Nghe nhạc kỷ niệm"
+              title="Nghe Voice kỷ niệm"
             >
               <img
                 src="/template/icon_music.png"

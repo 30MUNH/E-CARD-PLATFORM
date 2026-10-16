@@ -47,20 +47,6 @@ const SlideStageContent: React.FC<SlideStageContentProps> = ({ onVerifyRedirectS
     setLoveDays(calculateLoveDays(loveStartDate));
   }, [loveStartDate]);
 
-  useEffect(() => {
-    if (currentSlide.id === 'setting' && ecardId) {
-      if (isPreviewMode) return;
-      const timer = setTimeout(() => {
-        if (onVerifyRedirectSetting) {
-          onVerifyRedirectSetting(ecardId);
-        } else {
-          navigate(`/ecd/custom-edit/${ecardId}`);
-        }
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [currentSlide.id, ecardId, isPreviewMode, navigate, onVerifyRedirectSetting]);
-
   const handleCardChange = (slideId: SlideId) => {
     playTapSound();
     navigateToSlide(slideId);
@@ -73,7 +59,7 @@ const SlideStageContent: React.FC<SlideStageContentProps> = ({ onVerifyRedirectS
 
   const albumImages = config.albumData.map((item) => item.image_url);
   const hasTimeline = Boolean(config.slideVisibility?.timeline);
-  const contentSlides = activeSlides.filter((s) => s.id !== 'setting');
+  const contentSlides = activeSlides;
 
   return (
     <div className="flex flex-col h-full min-h-screen relative bg-[#FFE4E4]">
@@ -216,19 +202,7 @@ const SlideStageContent: React.FC<SlideStageContentProps> = ({ onVerifyRedirectS
                   onNext={goNextSlide}
                 />
               );
-            case 'setting':
-              return (
-                <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-                  <p className="text-xl text-gray-700 mb-4">
-                    {isPreviewMode
-                      ? 'Trang Cài đặt (Trong chế độ Xem trước Admin, chuyển hướng được tạm tắt)'
-                      : 'Đang chuyển hướng bạn đến trang cài đặt...'}
-                  </p>
-                  {!isPreviewMode && (
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-700" />
-                  )}
-                </div>
-              );
+
             default:
               return (
                 <div className="w-full max-w-sm mx-auto text-center text-xl font-medium text-gray-500">

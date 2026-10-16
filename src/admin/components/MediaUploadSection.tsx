@@ -371,17 +371,17 @@ export const MediaUploadSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Audio / Music Section */}
+      {/* Audio / Voice Section */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
         <div className="flex items-center gap-2">
           <Music className="w-5 h-5 text-[#A33149]" />
-          <h2 className="text-lg font-bold text-slate-900">Âm nhạc &amp; Bản thu âm lời nhắn</h2>
+          <h2 className="text-lg font-bold text-slate-900">Voice — Đoạn ghi âm từ khách hàng</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Tên bài hát / Bản thu âm
+              Tiêu đề Voice / Bản thu âm
             </label>
             <input
               type="text"
@@ -394,13 +394,14 @@ export const MediaUploadSection: React.FC = () => {
                   ),
                 }))
               }
+              placeholder="Ví dụ: Lời nhắn yêu thương / Một Đời"
               className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm"
             />
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Mã YouTube Video ID (hoặc tải file MP3 bên dưới)
+              Mã YouTube Video ID (Tùy chọn nếu không tải MP3)
             </label>
             <input
               type="text"
@@ -421,10 +422,10 @@ export const MediaUploadSection: React.FC = () => {
           <div className="md:col-span-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
             <div className="space-y-1">
               <div className="text-sm font-semibold text-slate-800">
-                Tải tệp âm thanh MP3 / WAV / M4A (Tối đa 25 MB)
+                Tải tệp ghi âm của khách hàng (MP3 / WAV / M4A)
               </div>
               <p className="text-xs text-slate-500">
-                Bản thu âm sẽ hiển thị trình phát trực tiếp trên trang Nhạc và Lá thư.
+                Đoạn ghi âm sẽ hiển thị và phát trực tiếp trên tab Voice và biểu tượng loa ở Lá thư.
               </p>
               {musicItem?.audio_url && (
                 <audio controls src={musicItem.audio_url} className="mt-2 h-9 w-full max-w-md" />

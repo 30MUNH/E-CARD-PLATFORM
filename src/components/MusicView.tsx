@@ -39,7 +39,8 @@ export const MusicView: React.FC<MusicViewProps> = ({
     ? preloadedData.musicData[0]
     : preloadedData.musicData;
 
-  const hasCustomAudio = Boolean(musicItem?.audio_url);
+  const effectiveAudioUrl = musicItem?.audio_url || (!musicItem?.youtube_id ? '/sounds/soundtrack.mp3' : undefined);
+  const hasCustomAudio = Boolean(effectiveAudioUrl);
 
   useEffect(() => {
     if (hasCustomAudio) {
@@ -244,24 +245,16 @@ export const MusicView: React.FC<MusicViewProps> = ({
     return () => clearInterval(interval);
   }, [player, hasCustomAudio]);
 
-  if (!musicItem || (!musicItem.youtube_id && !musicItem.audio_url)) {
-    return (
-      <div className="p-4 w-full max-w-sm mx-auto text-center text-gray-500">
-        Không có nhạc để phát
-      </div>
-    );
-  }
-
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const artistLabel = musicItem.artist || 'Duni';
-  const quoteLabel = musicItem.quote || 'Love you to the saturn and back';
+  const artistLabel = musicItem?.artist || 'Duni';
+  const quoteLabel = musicItem?.quote || 'Love you to the saturn and back';
 
   return (
     <div className="p-4 md:p-8 w-full max-w-sm md:max-w-2xl lg:max-w-3xl mx-auto">
-      {hasCustomAudio && musicItem.audio_url ? (
+      {hasCustomAudio && effectiveAudioUrl ? (
         <audio
           ref={htmlAudioRef}
-          src={musicItem.audio_url}
+          src={effectiveAudioUrl}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime || 0)}
           onEnded={() => setIsPlaying(false)}

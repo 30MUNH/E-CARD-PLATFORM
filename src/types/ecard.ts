@@ -12,6 +12,7 @@ export type SlideId =
   | 'homepage'
   | 'album'
   | 'music'
+  | 'voice'
   | 'letter'
   | 'timeline'
   | 'game'

@@ -15,7 +15,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onStart,
   onTouchStart,
   welcomeConfig,
-  coupleNames,
 }) => {
   const clickLockRef = useRef(false);
   const touchLockRef = useRef(false);
@@ -42,43 +41,25 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   const buttonLabel = welcomeConfig?.buttonLabel || 'Bắt đầu';
 
   return (
-    <div
-      className="overflow-hidden flex flex-col items-center justify-between md:justify-center grow min-h-full w-full bg-cover bg-center px-6 pt-8 pb-[max(3rem,env(safe-area-inset-bottom))]"
-      style={{ backgroundImage: `url('${bgImage}')` }}
-    >
-      {/* Tablet & Desktop Editorial Invitation Header (hidden on mobile to preserve exact mobile visual match) */}
-      <div className="hidden md:flex flex-col items-center text-center bg-white/80 backdrop-blur-md rounded-3xl px-10 py-8 shadow-xl border border-rose-100/80 max-w-lg mb-8">
-        <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mb-3">
-          <Heart className="w-6 h-6 text-[#A33149] fill-[#A33149] animate-pulse motion-reduce:animate-none" />
-        </div>
-        {welcomeConfig?.heading && (
-          <h1
-            className="text-3xl lg:text-4xl text-[#A33149] mb-2"
-            style={{ fontFamily: 'Pacifico, cursive', fontWeight: 400 }}
-          >
-            {welcomeConfig.heading}
-          </h1>
-        )}
-        {coupleNames && (
-          <p className="text-lg font-semibold text-[#8c5261] mb-1">
-            {coupleNames.femaleName} &amp; {coupleNames.maleName}
-          </p>
-        )}
-        {welcomeConfig?.subheading && (
-          <p className="text-sm text-gray-600">{welcomeConfig.subheading}</p>
-        )}
-      </div>
-
-      <motion.button
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-        onClick={handleClick}
-        onTouchStart={handleTouchStart}
-        className="bg-[#A33149] hover:bg-[#8e283e] text-white rounded-full px-12 py-3 md:px-14 md:py-4 text-xl font-semibold shadow-md active:scale-95 transition mb-10 mt-[75vh] md:mt-0 md:mb-0"
+    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#FAF7F2]">
+      {/* Center Welcome Card with Dashed Heart & Thẻ Tình Yêu Logo */}
+      <div
+        className="w-full max-w-md h-screen max-h-[920px] flex flex-col items-center justify-between bg-cover md:bg-contain bg-center bg-no-repeat px-6 pt-10 pb-[max(3rem,env(safe-area-inset-bottom))] relative"
+        style={{ backgroundImage: `url('${bgImage}')` }}
       >
-        {buttonLabel}
-      </motion.button>
+        <div className="flex-1" />
+
+        <motion.button
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          onClick={handleClick}
+          onTouchStart={handleTouchStart}
+          className="bg-[#8A2B3D] hover:bg-[#782434] text-white rounded-full px-12 py-3 md:px-14 md:py-3.5 text-xl font-semibold shadow-lg active:scale-95 transition mb-6"
+        >
+          {buttonLabel}
+        </motion.button>
+      </div>
     </div>
   );
 };

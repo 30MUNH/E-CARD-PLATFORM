@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { EcardPreloadData, resolveImageUrl } from '../data/ecardData';
 import { FloatingNavButtons } from './FloatingNavButtons';
@@ -33,21 +33,13 @@ export const AlbumView: React.FC<AlbumViewProps> = ({
       ? images
       : defaultImages;
 
-  const [captions, setCaptions] = useState<string[]>(
-    Array(albumImages.length).fill('Khoảnh khắc đáng nhớ 💖')
-  );
-
-  useEffect(() => {
-    if (preloadedData.albumData) {
-      setCaptions(
-        albumImages.map(
-          (url, idx) =>
-            preloadedData.albumData[idx]?.caption ||
-            preloadedData.albumData.find((item) => item.image_url === url)?.caption ||
-            'Khoảnh khắc đáng nhớ 💖'
-        )
-      );
-    }
+  const captions = useMemo(() => {
+    return albumImages.map(
+      (url, idx) =>
+        preloadedData.albumData?.[idx]?.caption ||
+        preloadedData.albumData?.find((item) => item.image_url === url)?.caption ||
+        'Khoảnh khắc đáng nhớ 💖'
+    );
   }, [preloadedData.albumData, albumImages]);
 
   const groups = chunkIntoThrees(albumImages);
@@ -119,89 +111,302 @@ export const AlbumView: React.FC<AlbumViewProps> = ({
     }
   }, [selectedIndex]);
 
+  // Adaptive layout partitioning based on photo count N
+  const renderAdaptivePhotoGrid = () => {
+    const N = albumImages.length;
+    if (N === 0) {
+      return (
+        <div className="p-8 text-center text-gray-500">
+          Chưa có hình ảnh nào trong album
+        </div>
+      );
+    }
+
+    if (N === 1) {
+      return (
+        <div className="flex flex-col items-center justify-center p-4 w-full max-w-sm mx-auto">
+          <div
+            onClick={() => setSelectedIndex(0)}
+            className="w-full bg-white p-3 rounded-2xl shadow-xl border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+          >
+            <img
+              src={resolveImageUrl(albumImages[0])}
+              alt="group1-img0"
+              className="w-full aspect-[4/5] object-cover rounded-xl"
+            />
+            {captions[0] && (
+              <p className="mt-2.5 text-center text-xs md:text-sm font-medium text-[#8c5261]">
+                {captions[0]}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (N === 2) {
+      return (
+        <div className="grid grid-cols-2 gap-3 md:gap-6 p-4 w-full max-w-md md:max-w-xl mx-auto items-center">
+          <div
+            onClick={() => setSelectedIndex(0)}
+            className="bg-white p-2.5 rounded-xl shadow-lg border border-rose-100 cursor-pointer hover:scale-[1.03] transition-transform -rotate-1"
+          >
+            <img
+              src={resolveImageUrl(albumImages[0])}
+              alt="group1-img0"
+              className="w-full aspect-square object-cover rounded-lg"
+            />
+            {captions[0] && (
+              <p className="mt-2 text-center text-xs font-medium text-[#8c5261] line-clamp-1">
+                {captions[0]}
+              </p>
+            )}
+          </div>
+          <div
+            onClick={() => setSelectedIndex(1)}
+            className="bg-white p-2.5 rounded-xl shadow-lg border border-rose-100 cursor-pointer hover:scale-[1.03] transition-transform rotate-1"
+          >
+            <img
+              src={resolveImageUrl(albumImages[1])}
+              alt="group1-img1"
+              className="w-full aspect-square object-cover rounded-lg"
+            />
+            {captions[1] && (
+              <p className="mt-2 text-center text-xs font-medium text-[#8c5261] line-clamp-1">
+                {captions[1]}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (N === 4) {
+      return (
+        <div className="grid grid-cols-2 gap-3 md:gap-5 p-3 w-full max-w-md md:max-w-2xl mx-auto">
+          {albumImages.map((imgUrl, idx) => (
+            <div
+              key={idx}
+              onClick={() => setSelectedIndex(idx)}
+              className="bg-white p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+            >
+              <img
+                src={resolveImageUrl(imgUrl)}
+                alt={`group1-img${idx}`}
+                className="w-full aspect-square object-cover rounded-lg"
+              />
+              {captions[idx] && (
+                <p className="mt-1.5 text-center text-xs text-[#8c5261] truncate">
+                  {captions[idx]}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // General multi-photo layout: Partition into alternating pattern blocks
+    // Pattern 1: 1 large on left (58%) + 2 stacked on right (40%)
+    // Pattern 2: 2 stacked on left (40%) + 1 large on right (58%)
+    // Remainder of 2: 2 balanced side-by-side
+    // Remainder of 1: 1 centered card
+    const blocks: React.ReactNode[] = [];
+    let i = 0;
+    let blockIdx = 0;
+
+    while (i < N) {
+      const remaining = N - i;
+
+      // If exactly 4 remaining, output two rows of 2
+      if (remaining === 4 && i > 0) {
+        const idx0 = i;
+        const idx1 = i + 1;
+        const idx2 = i + 2;
+        const idx3 = i + 3;
+        blocks.push(
+          <div key={`grid-4-${i}`} className="grid grid-cols-2 gap-2.5 md:gap-4 w-full max-w-2xl lg:max-w-4xl py-1.5">
+            {[idx0, idx1, idx2, idx3].map((photoIdx) => (
+              <div
+                key={photoIdx}
+                onClick={() => setSelectedIndex(photoIdx)}
+                className="bg-white p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+              >
+                <img
+                  src={resolveImageUrl(albumImages[photoIdx])}
+                  alt={`group${blockIdx + 1}-img${photoIdx}`}
+                  className="w-full aspect-square object-cover rounded-lg"
+                />
+              </div>
+            ))}
+          </div>
+        );
+        i += 4;
+        blockIdx++;
+        continue;
+      }
+
+      // If 3 or more remaining, use alternating 3-photo asymmetrical scrapbooks
+      if (remaining >= 3) {
+        const photo0 = i;
+        const photo1 = i + 1;
+        const photo2 = i + 2;
+        const isEvenBlock = blockIdx % 2 === 0;
+
+        if (isEvenBlock) {
+          // Large on left (58%) + 2 small stacked on right (40%)
+          blocks.push(
+            <div key={`block-even-${photo0}`} className="flex gap-2 md:gap-4 w-full max-w-2xl lg:max-w-4xl py-1.5">
+              <div
+                onClick={() => setSelectedIndex(photo0)}
+                className="w-[58%] bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+              >
+                <img
+                  src={resolveImageUrl(albumImages[photo0])}
+                  alt={photo0 === 0 ? 'group1-img0' : `group${blockIdx + 1}-img0`}
+                  className="w-full aspect-square object-cover rounded-lg md:rounded-xl"
+                  onClick={() => setSelectedIndex(photo0)}
+                />
+              </div>
+              <div className="flex flex-col justify-between w-[40%] gap-2 md:gap-4">
+                <div
+                  onClick={() => setSelectedIndex(photo1)}
+                  className="w-full bg-white p-1.5 md:p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+                >
+                  <img
+                    src={resolveImageUrl(albumImages[photo1])}
+                    alt={photo0 === 0 ? 'group1-img1' : `group${blockIdx + 1}-img1`}
+                    className="w-full aspect-square object-cover rounded-lg"
+                    onClick={() => setSelectedIndex(photo1)}
+                  />
+                </div>
+                <div
+                  onClick={() => setSelectedIndex(photo2)}
+                  className="w-full bg-white p-1.5 md:p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+                >
+                  <img
+                    src={resolveImageUrl(albumImages[photo2])}
+                    alt={photo0 === 0 ? 'group1-img2' : `group${blockIdx + 1}-img2`}
+                    className="w-full aspect-square object-cover rounded-lg"
+                    onClick={() => setSelectedIndex(photo2)}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        } else {
+          // 2 small stacked on left (40%) + Large on right (58%)
+          blocks.push(
+            <div key={`block-odd-${photo0}`} className="flex gap-2 md:gap-4 w-full max-w-2xl lg:max-w-4xl py-1.5">
+              <div className="flex flex-col justify-between w-[40%] gap-2 md:gap-4">
+                <div
+                  onClick={() => setSelectedIndex(photo0)}
+                  className="w-full bg-white p-1.5 md:p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+                >
+                  <img
+                    src={resolveImageUrl(albumImages[photo0])}
+                    alt={`group${blockIdx + 1}-img0`}
+                    className="w-full aspect-square object-cover rounded-lg"
+                    onClick={() => setSelectedIndex(photo0)}
+                  />
+                </div>
+                <div
+                  onClick={() => setSelectedIndex(photo1)}
+                  className="w-full bg-white p-1.5 md:p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+                >
+                  <img
+                    src={resolveImageUrl(albumImages[photo1])}
+                    alt={`group${blockIdx + 1}-img1`}
+                    className="w-full aspect-square object-cover rounded-lg"
+                    onClick={() => setSelectedIndex(photo1)}
+                  />
+                </div>
+              </div>
+              <div
+                onClick={() => setSelectedIndex(photo2)}
+                className="w-[58%] bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+              >
+                <img
+                  src={resolveImageUrl(albumImages[photo2])}
+                  alt={`group${blockIdx + 1}-img2`}
+                  className="w-full aspect-square object-cover rounded-lg md:rounded-xl"
+                  onClick={() => setSelectedIndex(photo2)}
+                />
+              </div>
+            </div>
+          );
+        }
+        i += 3;
+        blockIdx++;
+        continue;
+      }
+
+      // Remainder 2
+      if (remaining === 2) {
+        const photo0 = i;
+        const photo1 = i + 1;
+        blocks.push(
+          <div key={`block-rem2-${photo0}`} className="grid grid-cols-2 gap-2.5 md:gap-4 w-full max-w-2xl lg:max-w-4xl py-1.5">
+            <div
+              onClick={() => setSelectedIndex(photo0)}
+              className="bg-white p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+            >
+              <img
+                src={resolveImageUrl(albumImages[photo0])}
+                alt={`group${blockIdx + 1}-img0`}
+                className="w-full aspect-square object-cover rounded-lg"
+                onClick={() => setSelectedIndex(photo0)}
+              />
+            </div>
+            <div
+              onClick={() => setSelectedIndex(photo1)}
+              className="bg-white p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+            >
+              <img
+                src={resolveImageUrl(albumImages[photo1])}
+                alt={`group${blockIdx + 1}-img1`}
+                className="w-full aspect-square object-cover rounded-lg"
+                onClick={() => setSelectedIndex(photo1)}
+              />
+            </div>
+          </div>
+        );
+        i += 2;
+        blockIdx++;
+        continue;
+      }
+
+      // Remainder 1
+      if (remaining === 1) {
+        const photo0 = i;
+        blocks.push(
+          <div key={`block-rem1-${photo0}`} className="flex justify-center w-full max-w-2xl lg:max-w-4xl py-1.5">
+            <div
+              onClick={() => setSelectedIndex(photo0)}
+              className="w-2/3 max-w-xs bg-white p-2.5 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+            >
+              <img
+                src={resolveImageUrl(albumImages[photo0])}
+                alt={`group${blockIdx + 1}-img0`}
+                className="w-full aspect-square object-cover rounded-lg"
+                onClick={() => setSelectedIndex(photo0)}
+              />
+            </div>
+          </div>
+        );
+        i += 1;
+        blockIdx++;
+        continue;
+      }
+    }
+
+    return blocks;
+  };
+
   return (
     <div className="w-full z-0">
       <div className="flex flex-col items-center gap-2 md:gap-4 p-2 md:p-6 max-h-[75vh] md:max-h-[80vh] overflow-y-auto">
-        {groups[0] && (
-          <div className="flex gap-2 md:gap-4 w-full max-w-2xl lg:max-w-4xl">
-            <img
-              src={resolveImageUrl(groups[0][0])}
-              alt="group1-img0"
-              className="w-[58%] aspect-square object-cover scale-[0.9] md:scale-95 md:rounded-xl md:shadow-md cursor-pointer hover:scale-105 transition-transform"
-              onClick={() => setSelectedIndex(0)}
-            />
-            <div className="flex flex-col justify-between w-[40%] gap-2 md:gap-4">
-              {groups[0][1] && (
-                <img
-                  src={resolveImageUrl(groups[0][1])}
-                  alt="group1-img1"
-                  className="w-full aspect-square object-cover scale-[0.9] md:scale-95 md:rounded-xl md:shadow-md cursor-pointer hover:scale-105 transition-transform"
-                  onClick={() => setSelectedIndex(1)}
-                />
-              )}
-              {groups[0][2] && (
-                <img
-                  src={resolveImageUrl(groups[0][2])}
-                  alt="group1-img2"
-                  className="w-full aspect-square object-cover scale-[0.9] md:scale-95 md:rounded-xl md:shadow-md cursor-pointer hover:scale-105 transition-transform"
-                  onClick={() => setSelectedIndex(2)}
-                />
-              )}
-            </div>
-          </div>
-        )}
-
-        {groups[1] && (
-          <div className="flex gap-2 md:gap-4 w-full max-w-2xl lg:max-w-4xl">
-            <div className="flex flex-col justify-between w-[40%] gap-2 md:gap-4">
-              {groups[1][1] && (
-                <img
-                  src={resolveImageUrl(groups[1][1])}
-                  alt="group2-img1"
-                  className="w-full aspect-square object-cover scale-[0.9] md:scale-95 md:rounded-xl md:shadow-md cursor-pointer hover:scale-105 transition-transform"
-                  onClick={() => setSelectedIndex(4)}
-                />
-              )}
-              {groups[1][2] && (
-                <img
-                  src={resolveImageUrl(groups[1][2])}
-                  alt="group2-img2"
-                  className="w-full aspect-square object-cover scale-[0.9] md:scale-95 md:rounded-xl md:shadow-md cursor-pointer hover:scale-105 transition-transform"
-                  onClick={() => setSelectedIndex(5)}
-                />
-              )}
-            </div>
-            {groups[1][0] && (
-              <img
-                src={resolveImageUrl(groups[1][0])}
-                alt="group2-img0"
-                className="w-[58%] aspect-square object-cover scale-[0.9] md:scale-95 md:rounded-xl md:shadow-md cursor-pointer hover:scale-105 transition-transform"
-                onClick={() => setSelectedIndex(3)}
-              />
-            )}
-          </div>
-        )}
-
-        {groups.slice(2).map((group, gIdx) => {
-          const groupNumber = gIdx + 3;
-          const baseIdx = (gIdx + 2) * 3;
-          return (
-            <div
-              key={groupNumber}
-              className="flex justify-center gap-2 md:gap-4 w-full max-w-2xl lg:max-w-4xl px-2 py-2"
-            >
-              {group.map((imgUrl, idx) => (
-                <img
-                  key={idx}
-                  src={resolveImageUrl(imgUrl)}
-                  alt={`group${groupNumber}-img${idx}`}
-                  className="w-1/3 aspect-square object-cover scale-[0.9] md:scale-95 md:rounded-xl md:shadow-md cursor-pointer hover:scale-105 transition-transform"
-                  onClick={() => setSelectedIndex(baseIdx + idx)}
-                />
-              ))}
-            </div>
-          );
-        })}
+        {renderAdaptivePhotoGrid()}
       </div>
 
       {selectedIndex !== null && (

@@ -48,7 +48,7 @@ export const SLIDES: SlideDefinition[] = [
   },
   {
     id: 'music',
-    title: 'Nhạc',
+    title: 'Voice',
     bgColor: 'bg-white',
     textColor: 'text-gray-800',
     backgroundImage: '/template/background-template-2.png',
@@ -81,10 +81,6 @@ export const SLIDES: SlideDefinition[] = [
     textColor: 'text-gray-800',
     backgroundImage: '/template/background-template-2.png',
   },
-  {
-    id: 'setting',
-    title: 'Cài đặt',
-  },
 ];
 
 export const DEFAULT_SLIDE_ORDER: SlideId[] = [
@@ -94,7 +90,6 @@ export const DEFAULT_SLIDE_ORDER: SlideId[] = [
   'letter',
   'game',
   'video',
-  'setting',
 ];
 
 export const AVAILABLE_TEMPLATES: TemplateDefinition[] = [
@@ -106,7 +101,7 @@ export const AVAILABLE_TEMPLATES: TemplateDefinition[] = [
       'Giao diện chuẩn By.Duni với khung ảnh Polaroid, hiệu ứng máy đánh chữ lãng mạn, trình phát nhạc và trò chơi rút bài tương tác cho cặp đôi.',
     previewImageUrl: '/template/background-welcome.png',
     accentColor: '#A33149',
-    supportedSlides: ['homepage', 'album', 'music', 'letter', 'timeline', 'game', 'video', 'setting'],
+    supportedSlides: ['homepage', 'album', 'music', 'letter', 'timeline', 'game', 'video'],
     isDefault: true,
   },
   {
@@ -294,7 +289,7 @@ export const DEFAULT_ECARD_CONFIG: EcardConfig = {
   updatedAt: '2025-08-15T09:30:00.000Z',
   publicSlug: DEFAULT_ECARD_UUID,
   publicUrl: `/ecd/game/${DEFAULT_ECARD_UUID}`,
-  slideOrder: ['homepage', 'album', 'music', 'letter', 'game', 'video', 'setting'],
+  slideOrder: ['homepage', 'album', 'music', 'letter', 'game', 'video'],
   slideVisibility: {
     homepage: true,
     album: true,
@@ -303,7 +298,6 @@ export const DEFAULT_ECARD_CONFIG: EcardConfig = {
     timeline: false,
     game: true,
     video: false,
-    setting: true,
   },
 };
 

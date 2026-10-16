@@ -13,12 +13,12 @@ const CONFIGURABLE_SLIDES: Array<{ id: SlideId; label: string; description: stri
   {
     id: 'album',
     label: 'Album Ảnh (Photo Album)',
-    description: 'Bố cục ảnh kỷ niệm nghệ thuật và chế độ xem phóng to Lightbox.',
+    description: 'Bố cục ảnh kỷ niệm nghệ thuật tự động sắp xếp theo thứ tự tải lên.',
   },
   {
     id: 'music',
-    label: 'Âm nhạc (Music Player)',
-    description: 'Trình phát bài hát kỷ niệm hoặc lời nhắn thoại.',
+    label: 'Voice (Bản thu âm Voice)',
+    description: 'Đoạn ghi âm lời nhắn từ khách hàng hoặc bài hát kỷ niệm.',
   },
   {
     id: 'letter',
@@ -58,16 +58,17 @@ export const TemplateSettingsSection: React.FC = () => {
       list.splice(targetIdx, 0, moved);
       return {
         ...prev,
-        slideOrder: [...list, 'setting'],
+        slideOrder: list,
       };
     });
   };
 
   const toggleSlideVisibility = (slideId: SlideId, checked: boolean) => {
     updateDraft((prev) => {
-      const nextOrder: SlideId[] = prev.slideOrder.includes(slideId)
-        ? prev.slideOrder
-        : [...prev.slideOrder.filter((s) => s !== 'setting'), slideId, 'setting'];
+      const cleanOrder: SlideId[] = prev.slideOrder.filter((s) => s !== 'setting');
+      const nextOrder: SlideId[] = cleanOrder.includes(slideId)
+        ? cleanOrder
+        : [...cleanOrder, slideId];
       return {
         ...prev,
         hasVideo: slideId === 'video' ? checked : prev.hasVideo,
