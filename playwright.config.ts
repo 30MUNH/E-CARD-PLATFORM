@@ -10,7 +10,7 @@ export default defineConfig({
   workers: 1,
   reporter: 'list',
   use: {
-    baseURL: 'http://127.0.0.1:5173',
+    baseURL: 'http://127.0.0.1:5180',
     trace: 'off',
     launchOptions: {
       executablePath: '/usr/bin/google-chrome',
@@ -18,8 +18,8 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: 'npm run dev -- --port 5173 --host 127.0.0.1',
-    url: 'http://127.0.0.1:5173',
+    command: 'npm run dev -- --port 5180 --host 127.0.0.1',
+    url: 'http://127.0.0.1:5180',
     reuseExistingServer: true,
     timeout: 30000,
   },

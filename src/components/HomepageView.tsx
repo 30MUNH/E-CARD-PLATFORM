@@ -104,48 +104,61 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
               )}
             </div>
 
-            <div className="flex items-center justify-between bg-[#e4e3e4] md:bg-[#f2e8eb] rounded-2xl py-3 px-4 md:py-6 md:px-8 md:shadow-md">
-              <div className="flex flex-col items-center">
-                <img
-                  src={resolveImageUrl(preloadedData.homepageData.avatar_female)}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover mb-1 animate-spin-slow motion-reduce:animate-none"
-                  alt="avatar-1"
-                />
-                <p
-                  className="text-[#A33149] text-lg md:text-xl font-bold"
-                  style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
-                >
-                  {preloadedData.ecardData.female_name}
-                </p>
-              </div>
-
-              <div className="flex flex-col items-center justify-center text-center">
-                <Heart
-                  className="w-10 h-10 md:w-12 md:h-12 animate-[pulse_1s_ease-in-out_infinite] motion-reduce:animate-none"
-                  fill="#FF0000"
-                  style={{ stroke: '#e4e3e4', strokeWidth: 2 }}
-                />
-                <div className="text-[#A33149] text-3xl md:text-4xl font-bold">{loveDays}</div>
-                <div
-                  className="text-[#A33149] text-sm md:text-base font-medium"
-                  style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
-                >
-                  ngày
+            <div className="bg-[#e4e3e4] md:bg-[#f2e8eb] rounded-2xl py-3 px-3 md:py-6 md:px-6 md:shadow-md">
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:gap-4">
+                {/* Female Column */}
+                <div className="flex flex-col items-center min-w-0">
+                  <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
+                    <img
+                      src={resolveImageUrl(preloadedData.homepageData.avatar_female)}
+                      className="w-full h-full object-cover rounded-full animate-spin-slow motion-reduce:animate-none shrink-0"
+                      alt="avatar-1"
+                    />
+                  </div>
+                  <p
+                    className="w-full text-center text-[#A33149] text-base md:text-xl font-bold truncate mt-1.5 px-1 leading-normal"
+                    style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '700' }}
+                    title={preloadedData.ecardData.female_name}
+                  >
+                    {preloadedData.ecardData.female_name}
+                  </p>
                 </div>
-              </div>
 
-              <div className="flex flex-col items-center">
-                <img
-                  src={resolveImageUrl(preloadedData.homepageData.avatar_male)}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover mb-1 animate-spin-slow motion-reduce:animate-none"
-                  alt="avatar-2"
-                />
-                <p
-                  className="text-[#A33149] text-lg md:text-xl font-bold"
-                  style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
-                >
-                  {preloadedData.ecardData.male_name}
-                </p>
+                {/* Days Counter Column */}
+                <div className="flex flex-col items-center justify-center text-center shrink-0 px-1 sm:px-3">
+                  <Heart
+                    className="w-9 h-9 md:w-11 md:h-11 animate-[pulse_1s_ease-in-out_infinite] motion-reduce:animate-none shrink-0"
+                    fill="#FF0000"
+                    style={{ stroke: '#e4e3e4', strokeWidth: 2 }}
+                  />
+                  <div className="text-[#A33149] text-3xl md:text-4xl font-bold leading-tight mt-0.5">
+                    {loveDays}
+                  </div>
+                  <div
+                    className="text-[#A33149] text-sm md:text-base font-medium"
+                    style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '600' }}
+                  >
+                    ngày
+                  </div>
+                </div>
+
+                {/* Male Column */}
+                <div className="flex flex-col items-center min-w-0">
+                  <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
+                    <img
+                      src={resolveImageUrl(preloadedData.homepageData.avatar_male)}
+                      className="w-full h-full object-cover rounded-full animate-spin-slow motion-reduce:animate-none shrink-0"
+                      alt="avatar-2"
+                    />
+                  </div>
+                  <p
+                    className="w-full text-center text-[#A33149] text-base md:text-xl font-bold truncate mt-1.5 px-1 leading-normal"
+                    style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '700' }}
+                    title={preloadedData.ecardData.male_name}
+                  >
+                    {preloadedData.ecardData.male_name}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
