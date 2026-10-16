@@ -105,27 +105,27 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
             </div>
 
             <div className="bg-[#e4e3e4] md:bg-[#f2e8eb] rounded-2xl py-3 px-2 sm:px-3 md:py-4 md:px-3 lg:py-6 lg:px-6 md:shadow-md">
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-2 md:gap-2 lg:gap-4">
+              <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
                 {/* Female Column */}
-                <div className="flex flex-col items-center min-w-0">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-20 md:h-20 lg:w-24 lg:h-24 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
+                <div className="flex flex-col items-center justify-start text-center min-w-0">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-20 md:h-20 lg:w-24 lg:h-24 shrink-0 rounded-full overflow-hidden flex items-center justify-center shadow-sm">
                     <img
                       src={resolveImageUrl(preloadedData.homepageData.avatar_female)}
                       className="w-full h-full object-cover rounded-full animate-spin-slow motion-reduce:animate-none shrink-0"
                       alt="avatar-1"
                     />
                   </div>
-                  <p
-                    className="w-full text-center text-[#A33149] text-sm sm:text-base md:text-sm lg:text-lg font-bold truncate mt-1.5 px-0.5 leading-normal"
+                  <span
+                    className="w-full text-center text-[#A33149] text-sm sm:text-base md:text-sm lg:text-lg font-bold mt-2 px-1 leading-snug line-clamp-2 break-words"
                     style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '700' }}
                     title={preloadedData.ecardData.female_name}
                   >
                     {preloadedData.ecardData.female_name}
-                  </p>
+                  </span>
                 </div>
 
                 {/* Days Counter Column */}
-                <div className="flex flex-col items-center justify-center text-center shrink-0 px-1 sm:px-2 md:px-1 lg:px-3">
+                <div className="flex flex-col items-center justify-center text-center shrink-0 px-1 sm:px-2 md:px-1 lg:px-3 pt-1">
                   <Heart
                     className="w-8 h-8 sm:w-9 sm:h-9 md:w-9 md:h-9 lg:w-11 lg:h-11 animate-[pulse_1s_ease-in-out_infinite] motion-reduce:animate-none shrink-0"
                     fill="#FF0000"
@@ -143,21 +143,21 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
                 </div>
 
                 {/* Male Column */}
-                <div className="flex flex-col items-center min-w-0">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-20 md:h-20 lg:w-24 lg:h-24 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
+                <div className="flex flex-col items-center justify-start text-center min-w-0">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-20 md:h-20 lg:w-24 lg:h-24 shrink-0 rounded-full overflow-hidden flex items-center justify-center shadow-sm">
                     <img
                       src={resolveImageUrl(preloadedData.homepageData.avatar_male)}
                       className="w-full h-full object-cover rounded-full animate-spin-slow motion-reduce:animate-none shrink-0"
                       alt="avatar-2"
                     />
                   </div>
-                  <p
-                    className="w-full text-center text-[#A33149] text-sm sm:text-base md:text-sm lg:text-lg font-bold truncate mt-1.5 px-0.5 leading-normal"
+                  <span
+                    className="w-full text-center text-[#A33149] text-sm sm:text-base md:text-sm lg:text-lg font-bold mt-2 px-1 leading-snug line-clamp-2 break-words"
                     style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '700' }}
                     title={preloadedData.ecardData.male_name}
                   >
                     {preloadedData.ecardData.male_name}
-                  </p>
+                  </span>
                 </div>
               </div>
             </div>
@@ -165,7 +165,7 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
         )}
       </div>
 
-      <FloatingNavButtons onNext={onNext} bottomOffsetClass="bottom-[5vh]" />
+      <FloatingNavButtons onNext={onNext} />
     </div>
   );
 };

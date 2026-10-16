@@ -95,11 +95,7 @@ export const GameView: React.FC<GameViewProps> = ({ onBack, onNext }) => {
                 50% { transform: translateY(-10px); }
               }
             `}</style>
-          <FloatingNavButtons
-            onBack={onBack}
-            onNext={onNext}
-            bottomOffsetClass="bottom-[5vh]"
-          />
+          <FloatingNavButtons onBack={onBack} onNext={onNext} />
         </>
       ) : (
         <>
@@ -131,11 +127,7 @@ export const GameView: React.FC<GameViewProps> = ({ onBack, onNext }) => {
           >
             Bắt đầu
           </button>
-          <FloatingNavButtons
-            onBack={onBack}
-            onNext={onNext}
-            bottomOffsetClass="bottom-[8vh]"
-          />
+          <FloatingNavButtons onBack={onBack} onNext={onNext} />
         </>
       )}
     </div>

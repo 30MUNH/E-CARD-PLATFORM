@@ -26,11 +26,7 @@ export const VideoView: React.FC<VideoViewProps> = ({ videoUrl, onBack, onNext }
         className="w-full h-full object-contain"
         playsInline
       />
-      <FloatingNavButtons
-        onBack={onBack}
-        onNext={onNext}
-        bottomOffsetClass="bottom-[5vh]"
-      />
+      <FloatingNavButtons onBack={onBack} onNext={onNext} />
     </div>
   );
 };

@@ -78,11 +78,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
         })}
       </div>
 
-      <FloatingNavButtons
-        onBack={onBack}
-        onNext={onNext}
-        bottomOffsetClass="bottom-[5vh]"
-      />
+      <FloatingNavButtons onBack={onBack} onNext={onNext} />
     </div>
   );
 };

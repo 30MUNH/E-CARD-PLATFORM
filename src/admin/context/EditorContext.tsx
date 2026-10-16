@@ -192,7 +192,6 @@ export function cardConfigToDraftPayload(card: EcardConfig): SaveCardDraftPayloa
       timeline: false,
       game: true,
       video: card.hasVideo,
-      setting: true,
       ...(card.slideVisibility || {}),
     },
   };

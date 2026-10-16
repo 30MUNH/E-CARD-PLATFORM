@@ -3,40 +3,45 @@ import React from 'react';
 interface FloatingNavButtonsProps {
   onBack?: () => void;
   onNext?: () => void;
-  bottomOffsetClass?: 'bottom-[5vh]' | 'bottom-[8vh]';
+  bottomOffsetClass?: string;
 }
 
 export const FloatingNavButtons: React.FC<FloatingNavButtonsProps> = ({
   onBack,
   onNext,
-  bottomOffsetClass = 'bottom-[5vh]',
+  bottomOffsetClass = 'bottom-5 sm:bottom-6 md:bottom-8',
 }) => {
   return (
     <>
       {onBack && (
         <button
           onClick={onBack}
-          className={`fixed ${bottomOffsetClass} left-[10vw] transform -translate-x-1/2 rounded-full py-2 text-base font-medium  transition active:scale-95 z-50`}
+          type="button"
+          aria-label="Trang trước"
+          className={`fixed ${bottomOffsetClass} left-4 sm:left-6 md:left-8 rounded-full p-1 transition active:scale-95 z-50`}
         >
           <img
             src="/template/back.png"
-            alt="arrow-right"
-            className="w-12 h-12 animate-wiggle-x"
+            alt="arrow-back"
+            className="w-12 h-12 animate-wiggle-x drop-shadow-md"
           />
         </button>
       )}
       {onNext && (
         <button
           onClick={onNext}
-          className={`fixed ${bottomOffsetClass} right-0 transform -translate-x-1/2 rounded-full py-2 text-base font-medium  transition active:scale-95 z-50`}
+          type="button"
+          aria-label="Trang tiếp theo"
+          className={`fixed ${bottomOffsetClass} right-4 sm:right-6 md:right-8 rounded-full p-1 transition active:scale-95 z-50`}
         >
           <img
             src="/template/next.png"
-            alt="arrow-right"
-            className="w-12 h-12 animate-wiggle-x"
+            alt="arrow-next"
+            className="w-12 h-12 animate-wiggle-x drop-shadow-md"
           />
         </button>
       )}
     </>
   );
 };
+

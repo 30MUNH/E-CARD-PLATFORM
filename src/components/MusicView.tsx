@@ -377,11 +377,7 @@ export const MusicView: React.FC<MusicViewProps> = ({
         </div>
       </div>
 
-      <FloatingNavButtons
-        onBack={onBack}
-        onNext={onNext}
-        bottomOffsetClass="bottom-[8vh]"
-      />
+      <FloatingNavButtons onBack={onBack} onNext={onNext} />
     </div>
   );
 };

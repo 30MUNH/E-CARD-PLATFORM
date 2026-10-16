@@ -53,11 +53,7 @@ export const LetterView: React.FC<LetterViewProps> = ({
         </div>
       </div>
 
-      <FloatingNavButtons
-        onBack={onBack}
-        onNext={onNext}
-        bottomOffsetClass="bottom-[5vh]"
-      />
+      <FloatingNavButtons onBack={onBack} onNext={onNext} />
     </div>
   );
 };

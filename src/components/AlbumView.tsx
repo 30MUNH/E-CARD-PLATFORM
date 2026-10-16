@@ -254,84 +254,120 @@ export const AlbumView: React.FC<AlbumViewProps> = ({
         const isEvenBlock = blockIdx % 2 === 0;
 
         if (isEvenBlock) {
-          // Large on left (58%) + 2 small stacked on right (40%)
+          // Large on left (56%) + 2 small stacked on right (42%) with balanced heights and captions
           blocks.push(
-            <div key={`block-even-${photo0}`} className="flex gap-2 md:gap-4 w-full max-w-2xl lg:max-w-4xl py-1.5">
+            <div key={`block-even-${photo0}`} className="flex gap-2.5 md:gap-4 w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl py-2">
               <div
                 onClick={() => setSelectedIndex(photo0)}
-                className="w-[58%] bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+                className="w-[56%] bg-white p-2.5 sm:p-3 rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-between"
               >
-                <img
-                  src={resolveImageUrl(albumImages[photo0])}
-                  alt={photo0 === 0 ? 'group1-img0' : `group${blockIdx + 1}-img0`}
-                  className="w-full aspect-square object-cover rounded-lg md:rounded-xl"
-                  onClick={() => setSelectedIndex(photo0)}
-                />
+                <div className="w-full flex-1 flex items-center justify-center overflow-hidden rounded-xl bg-rose-50/40">
+                  <img
+                    src={resolveImageUrl(albumImages[photo0])}
+                    alt={photo0 === 0 ? 'group1-img0' : `group${blockIdx + 1}-img0`}
+                    className="w-full h-full min-h-[160px] sm:min-h-[220px] aspect-[4/5] object-cover rounded-xl"
+                  />
+                </div>
+                {captions[photo0] && (
+                  <p className="mt-2 text-center text-xs sm:text-sm font-semibold text-[#8c5261] line-clamp-2 px-1">
+                    {captions[photo0]}
+                  </p>
+                )}
               </div>
-              <div className="flex flex-col justify-between w-[40%] gap-2 md:gap-4">
+              <div className="flex flex-col justify-between w-[42%] gap-2.5 sm:gap-3">
                 <div
                   onClick={() => setSelectedIndex(photo1)}
-                  className="w-full bg-white p-1.5 md:p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+                  className="w-full bg-white p-2 sm:p-2.5 rounded-xl sm:rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-between"
                 >
-                  <img
-                    src={resolveImageUrl(albumImages[photo1])}
-                    alt={photo0 === 0 ? 'group1-img1' : `group${blockIdx + 1}-img1`}
-                    className="w-full aspect-square object-cover rounded-lg"
-                    onClick={() => setSelectedIndex(photo1)}
-                  />
+                  <div className="w-full aspect-square overflow-hidden rounded-lg bg-rose-50/40">
+                    <img
+                      src={resolveImageUrl(albumImages[photo1])}
+                      alt={photo0 === 0 ? 'group1-img1' : `group${blockIdx + 1}-img1`}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                  {captions[photo1] && (
+                    <p className="mt-1.5 text-center text-[11px] sm:text-xs font-semibold text-[#8c5261] line-clamp-1 px-0.5">
+                      {captions[photo1]}
+                    </p>
+                  )}
                 </div>
                 <div
                   onClick={() => setSelectedIndex(photo2)}
-                  className="w-full bg-white p-1.5 md:p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+                  className="w-full bg-white p-2 sm:p-2.5 rounded-xl sm:rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-between"
                 >
-                  <img
-                    src={resolveImageUrl(albumImages[photo2])}
-                    alt={photo0 === 0 ? 'group1-img2' : `group${blockIdx + 1}-img2`}
-                    className="w-full aspect-square object-cover rounded-lg"
-                    onClick={() => setSelectedIndex(photo2)}
-                  />
+                  <div className="w-full aspect-square overflow-hidden rounded-lg bg-rose-50/40">
+                    <img
+                      src={resolveImageUrl(albumImages[photo2])}
+                      alt={photo0 === 0 ? 'group1-img2' : `group${blockIdx + 1}-img2`}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                  {captions[photo2] && (
+                    <p className="mt-1.5 text-center text-[11px] sm:text-xs font-semibold text-[#8c5261] line-clamp-1 px-0.5">
+                      {captions[photo2]}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
           );
         } else {
-          // 2 small stacked on left (40%) + Large on right (58%)
+          // 2 small stacked on left (42%) + Large on right (56%) with balanced heights and captions
           blocks.push(
-            <div key={`block-odd-${photo0}`} className="flex gap-2 md:gap-4 w-full max-w-2xl lg:max-w-4xl py-1.5">
-              <div className="flex flex-col justify-between w-[40%] gap-2 md:gap-4">
+            <div key={`block-odd-${photo0}`} className="flex gap-2.5 md:gap-4 w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl py-2">
+              <div className="flex flex-col justify-between w-[42%] gap-2.5 sm:gap-3">
                 <div
                   onClick={() => setSelectedIndex(photo0)}
-                  className="w-full bg-white p-1.5 md:p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+                  className="w-full bg-white p-2 sm:p-2.5 rounded-xl sm:rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-between"
                 >
-                  <img
-                    src={resolveImageUrl(albumImages[photo0])}
-                    alt={`group${blockIdx + 1}-img0`}
-                    className="w-full aspect-square object-cover rounded-lg"
-                    onClick={() => setSelectedIndex(photo0)}
-                  />
+                  <div className="w-full aspect-square overflow-hidden rounded-lg bg-rose-50/40">
+                    <img
+                      src={resolveImageUrl(albumImages[photo0])}
+                      alt={`group${blockIdx + 1}-img0`}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                  {captions[photo0] && (
+                    <p className="mt-1.5 text-center text-[11px] sm:text-xs font-semibold text-[#8c5261] line-clamp-1 px-0.5">
+                      {captions[photo0]}
+                    </p>
+                  )}
                 </div>
                 <div
                   onClick={() => setSelectedIndex(photo1)}
-                  className="w-full bg-white p-1.5 md:p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+                  className="w-full bg-white p-2 sm:p-2.5 rounded-xl sm:rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-between"
                 >
-                  <img
-                    src={resolveImageUrl(albumImages[photo1])}
-                    alt={`group${blockIdx + 1}-img1`}
-                    className="w-full aspect-square object-cover rounded-lg"
-                    onClick={() => setSelectedIndex(photo1)}
-                  />
+                  <div className="w-full aspect-square overflow-hidden rounded-lg bg-rose-50/40">
+                    <img
+                      src={resolveImageUrl(albumImages[photo1])}
+                      alt={`group${blockIdx + 1}-img1`}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                  {captions[photo1] && (
+                    <p className="mt-1.5 text-center text-[11px] sm:text-xs font-semibold text-[#8c5261] line-clamp-1 px-0.5">
+                      {captions[photo1]}
+                    </p>
+                  )}
                 </div>
               </div>
               <div
                 onClick={() => setSelectedIndex(photo2)}
-                className="w-[58%] bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+                className="w-[56%] bg-white p-2.5 sm:p-3 rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-between"
               >
-                <img
-                  src={resolveImageUrl(albumImages[photo2])}
-                  alt={`group${blockIdx + 1}-img2`}
-                  className="w-full aspect-square object-cover rounded-lg md:rounded-xl"
-                  onClick={() => setSelectedIndex(photo2)}
-                />
+                <div className="w-full flex-1 flex items-center justify-center overflow-hidden rounded-xl bg-rose-50/40">
+                  <img
+                    src={resolveImageUrl(albumImages[photo2])}
+                    alt={`group${blockIdx + 1}-img2`}
+                    className="w-full h-full min-h-[160px] sm:min-h-[220px] aspect-[4/5] object-cover rounded-xl"
+                  />
+                </div>
+                {captions[photo2] && (
+                  <p className="mt-2 text-center text-xs sm:text-sm font-semibold text-[#8c5261] line-clamp-2 px-1">
+                    {captions[photo2]}
+                  </p>
+                )}
               </div>
             </div>
           );
@@ -346,28 +382,36 @@ export const AlbumView: React.FC<AlbumViewProps> = ({
         const photo0 = i;
         const photo1 = i + 1;
         blocks.push(
-          <div key={`block-rem2-${photo0}`} className="grid grid-cols-2 gap-2.5 md:gap-4 w-full max-w-2xl lg:max-w-4xl py-1.5">
+          <div key={`block-rem2-${photo0}`} className="grid grid-cols-2 gap-2.5 md:gap-4 w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl py-2">
             <div
               onClick={() => setSelectedIndex(photo0)}
-              className="bg-white p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+              className="bg-white p-2 sm:p-2.5 rounded-xl sm:rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-between"
             >
               <img
                 src={resolveImageUrl(albumImages[photo0])}
                 alt={`group${blockIdx + 1}-img0`}
                 className="w-full aspect-square object-cover rounded-lg"
-                onClick={() => setSelectedIndex(photo0)}
               />
+              {captions[photo0] && (
+                <p className="mt-1.5 text-center text-xs font-semibold text-[#8c5261] line-clamp-1 px-0.5">
+                  {captions[photo0]}
+                </p>
+              )}
             </div>
             <div
               onClick={() => setSelectedIndex(photo1)}
-              className="bg-white p-2 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+              className="bg-white p-2 sm:p-2.5 rounded-xl sm:rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-between"
             >
               <img
                 src={resolveImageUrl(albumImages[photo1])}
                 alt={`group${blockIdx + 1}-img1`}
                 className="w-full aspect-square object-cover rounded-lg"
-                onClick={() => setSelectedIndex(photo1)}
               />
+              {captions[photo1] && (
+                <p className="mt-1.5 text-center text-xs font-semibold text-[#8c5261] line-clamp-1 px-0.5">
+                  {captions[photo1]}
+                </p>
+              )}
             </div>
           </div>
         );
@@ -380,17 +424,21 @@ export const AlbumView: React.FC<AlbumViewProps> = ({
       if (remaining === 1) {
         const photo0 = i;
         blocks.push(
-          <div key={`block-rem1-${photo0}`} className="flex justify-center w-full max-w-2xl lg:max-w-4xl py-1.5">
+          <div key={`block-rem1-${photo0}`} className="flex justify-center w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl py-2">
             <div
               onClick={() => setSelectedIndex(photo0)}
-              className="w-2/3 max-w-xs bg-white p-2.5 rounded-xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform"
+              className="w-2/3 max-w-xs bg-white p-2.5 rounded-2xl shadow-md border border-rose-100 cursor-pointer hover:scale-[1.02] transition-transform flex flex-col justify-between"
             >
               <img
                 src={resolveImageUrl(albumImages[photo0])}
                 alt={`group${blockIdx + 1}-img0`}
                 className="w-full aspect-square object-cover rounded-lg"
-                onClick={() => setSelectedIndex(photo0)}
               />
+              {captions[photo0] && (
+                <p className="mt-1.5 text-center text-xs font-semibold text-[#8c5261] line-clamp-1 px-0.5">
+                  {captions[photo0]}
+                </p>
+              )}
             </div>
           </div>
         );
@@ -404,8 +452,8 @@ export const AlbumView: React.FC<AlbumViewProps> = ({
   };
 
   return (
-    <div className="w-full z-0">
-      <div className="flex flex-col items-center gap-2 md:gap-4 p-2 md:p-6 max-h-[75vh] md:max-h-[80vh] overflow-y-auto">
+    <div className="w-full z-0 flex-1 flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center my-auto gap-2 md:gap-4 p-2 sm:p-4 md:p-6 w-full max-h-[76vh] md:max-h-[82vh] overflow-y-auto">
         {renderAdaptivePhotoGrid()}
       </div>
 
@@ -479,11 +527,7 @@ export const AlbumView: React.FC<AlbumViewProps> = ({
         </div>
       )}
 
-      <FloatingNavButtons
-        onBack={onBack}
-        onNext={onNext}
-        bottomOffsetClass="bottom-[5vh]"
-      />
+      <FloatingNavButtons onBack={onBack} onNext={onNext} />
     </div>
   );
 };

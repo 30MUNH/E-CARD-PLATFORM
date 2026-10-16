@@ -53,7 +53,6 @@ const SlideStageContent: React.FC<SlideStageContentProps> = ({ onVerifyRedirectS
   };
 
   const isTopAlignedSlide =
-    currentSlide.id === 'album' ||
     currentSlide.id === 'letter' ||
     currentSlide.id === 'timeline';
 
@@ -127,8 +126,8 @@ const SlideStageContent: React.FC<SlideStageContentProps> = ({ onVerifyRedirectS
         key={currentSlide.id}
         className={`flex-grow transition-all duration-500 ${
           isTopAlignedSlide
-            ? 'flex flex-col items-start md:items-center pt-[60px] md:pt-6 overflow-hidden'
-            : 'flex items-center justify-center'
+            ? 'flex flex-col items-center justify-start pt-14 pb-16 md:pt-6 md:pb-6 overflow-hidden'
+            : 'flex flex-col items-center justify-center pt-14 pb-16 md:pt-6 md:pb-6 overflow-hidden'
         } bg-cover bg-center`}
         style={{
           backgroundImage: `url(${currentSlide.backgroundImage || '/template/background-template-2.png'})`,

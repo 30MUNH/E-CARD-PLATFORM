@@ -180,7 +180,7 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     await page.locator('img[alt="group1-img0"]').click();
     const expandedImg = page.locator('img[alt="expanded"]');
     await expect(expandedImg).toBeVisible();
-    await expect(page.locator('text=hẹ hẹ')).toBeVisible();
+    await expect(page.locator('.fixed.inset-0').getByText('hẹ hẹ')).toBeVisible();
 
     const overlay = page.locator('.fixed.inset-0.bg-black.bg-opacity-80');
     await overlay.evaluate((el) => {
@@ -208,7 +208,7 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
         })
       );
     });
-    await expect(page.locator('text=chinh nhật zui zeee')).toBeVisible();
+    await expect(page.locator('.fixed.inset-0').getByText('chinh nhật zui zeee')).toBeVisible();
 
     await overlay.click({ position: { x: 10, y: 10 } });
     await expect(expandedImg).toHaveCount(0);
