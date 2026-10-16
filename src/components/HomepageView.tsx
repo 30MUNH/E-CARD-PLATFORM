@@ -20,13 +20,13 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
   hasTimeline = false,
 }) => {
   return (
-    <div className="p-4 md:p-8 lg:p-10 w-full max-w-full sm:max-w-sm md:max-w-2xl lg:max-w-5xl sm:mx-auto">
-      <div className="lg:grid lg:grid-cols-12 lg:gap-10 lg:items-center lg:bg-white/75 lg:backdrop-blur-md lg:rounded-3xl lg:p-8 lg:shadow-xl lg:border lg:border-rose-100">
-        {/* Left Column on Desktop: Hero Couple Photo + Shortcut Icons */}
-        <div className="w-full px-4 pb-4 lg:px-0 lg:pb-0 lg:col-span-6">
+    <div className="p-4 md:p-6 lg:p-10 w-full max-w-full sm:max-w-md md:max-w-3xl lg:max-w-5xl sm:mx-auto">
+      <div className="md:grid md:grid-cols-12 md:gap-8 lg:gap-10 md:items-center md:bg-white/75 md:backdrop-blur-md md:rounded-3xl p-2 md:p-6 lg:p-8 md:shadow-xl md:border md:border-rose-100">
+        {/* Left Column on Tablet & Desktop: Hero Couple Photo + Shortcut Icons */}
+        <div className="w-full px-2 pb-3 md:px-0 md:pb-0 md:col-span-6">
           <button
             onClick={() => handleCardChange('album')}
-            className="w-full aspect-square md:aspect-[4/3] lg:aspect-square rounded-xl md:rounded-2xl overflow-hidden md:shadow-lg group relative"
+            className="w-full aspect-square rounded-xl md:rounded-2xl overflow-hidden md:shadow-lg group relative"
           >
             <img
               src={resolveImageUrl(preloadedData.homepageData.homepage_image)}
@@ -34,10 +34,10 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
               className="w-full h-full object-cover rounded-xl md:rounded-2xl group-hover:scale-[1.02] transition-transform duration-500"
             />
           </button>
-          <div className="mt-4 flex justify-between gap-4 justify-start md:justify-center lg:justify-start">
+          <div className="mt-4 flex justify-between gap-3 sm:gap-4 md:justify-center lg:justify-start">
             <button
               onClick={() => handleCardChange('music')}
-              className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex items-center justify-center md:bg-white/70 md:shadow-sm md:hover:scale-105 transition"
+              className="w-20 h-20 sm:w-24 sm:h-24 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-2xl p-2 flex items-center justify-center md:bg-white/70 md:shadow-sm md:hover:scale-105 transition"
               title="Nghe Voice kỷ niệm"
             >
               <img
@@ -48,7 +48,7 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
             </button>
             <button
               onClick={() => handleCardChange('letter')}
-              className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex items-center justify-center md:bg-white/70 md:shadow-sm md:hover:scale-105 transition"
+              className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-2xl p-2 flex items-center justify-center md:bg-white/70 md:shadow-sm md:hover:scale-105 transition"
               title="Đọc thư tình"
             >
               <img
@@ -63,7 +63,7 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
             {preloadedData.hasVideo && (
               <button
                 onClick={() => handleCardChange('video')}
-                className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex items-center justify-center md:bg-white/70 md:shadow-sm md:hover:scale-105 transition"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-2xl p-2 flex items-center justify-center md:bg-white/70 md:shadow-sm md:hover:scale-105 transition"
                 title="Xem video kỷ niệm"
               >
                 <img
@@ -76,7 +76,7 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
             {hasTimeline && (
               <button
                 onClick={() => handleCardChange('timeline')}
-                className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl p-2 flex flex-col items-center justify-center bg-white/80 text-[#A33149] shadow-sm hover:scale-105 transition"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-2xl p-2 flex flex-col items-center justify-center bg-white/80 text-[#A33149] shadow-sm hover:scale-105 transition"
                 title="Cột mốc tình yêu"
               >
                 <CalendarHeart className="w-9 h-9 mb-1" />
@@ -86,16 +86,16 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
           </div>
         </div>
 
-        {/* Right Column on Desktop: Couple Names & Live Love Counter */}
+        {/* Right Column on Tablet & Desktop: Couple Names & Live Love Counter */}
         {preloadedData.ecardData.template_id !== 'b8770825-3bb7-47af-aff1-1d4aa17975d9' && (
-          <div className="px-4 pb-4 mt-auto lg:px-0 lg:pb-0 lg:mt-0 lg:col-span-6 flex flex-col justify-center">
-            <div className="hidden lg:block mb-6 text-left">
+          <div className="px-2 pb-3 mt-auto md:px-0 md:pb-0 md:mt-0 md:col-span-6 flex flex-col justify-center">
+            <div className="hidden md:block mb-4 lg:mb-6 text-left">
               <span className="inline-block px-3 py-1 rounded-full bg-rose-100 text-[#A33149] text-xs font-semibold tracking-wider uppercase mb-2">
                 Lưu giữ kỷ niệm
               </span>
               <h2
-                className="text-3xl xl:text-4xl text-[#A33149] leading-snug"
-                style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
+                className="text-2xl md:text-3xl lg:text-4xl text-[#A33149] leading-snug"
+                style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '700' }}
               >
                 Hành trình yêu thương
               </h2>
@@ -104,11 +104,11 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
               )}
             </div>
 
-            <div className="bg-[#e4e3e4] md:bg-[#f2e8eb] rounded-2xl py-3 px-3 md:py-6 md:px-6 md:shadow-md">
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:gap-4">
+            <div className="bg-[#e4e3e4] md:bg-[#f2e8eb] rounded-2xl py-3 px-2 sm:px-3 md:py-4 md:px-3 lg:py-6 lg:px-6 md:shadow-md">
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-2 md:gap-2 lg:gap-4">
                 {/* Female Column */}
                 <div className="flex flex-col items-center min-w-0">
-                  <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-20 md:h-20 lg:w-24 lg:h-24 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
                     <img
                       src={resolveImageUrl(preloadedData.homepageData.avatar_female)}
                       className="w-full h-full object-cover rounded-full animate-spin-slow motion-reduce:animate-none shrink-0"
@@ -116,7 +116,7 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
                     />
                   </div>
                   <p
-                    className="w-full text-center text-[#A33149] text-base md:text-xl font-bold truncate mt-1.5 px-1 leading-normal"
+                    className="w-full text-center text-[#A33149] text-sm sm:text-base md:text-sm lg:text-lg font-bold truncate mt-1.5 px-0.5 leading-normal"
                     style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '700' }}
                     title={preloadedData.ecardData.female_name}
                   >
@@ -125,17 +125,17 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
                 </div>
 
                 {/* Days Counter Column */}
-                <div className="flex flex-col items-center justify-center text-center shrink-0 px-1 sm:px-3">
+                <div className="flex flex-col items-center justify-center text-center shrink-0 px-1 sm:px-2 md:px-1 lg:px-3">
                   <Heart
-                    className="w-9 h-9 md:w-11 md:h-11 animate-[pulse_1s_ease-in-out_infinite] motion-reduce:animate-none shrink-0"
+                    className="w-8 h-8 sm:w-9 sm:h-9 md:w-9 md:h-9 lg:w-11 lg:h-11 animate-[pulse_1s_ease-in-out_infinite] motion-reduce:animate-none shrink-0"
                     fill="#FF0000"
                     style={{ stroke: '#e4e3e4', strokeWidth: 2 }}
                   />
-                  <div className="text-[#A33149] text-3xl md:text-4xl font-bold leading-tight mt-0.5">
+                  <div className="text-[#A33149] text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-bold leading-tight mt-0.5">
                     {loveDays}
                   </div>
                   <div
-                    className="text-[#A33149] text-sm md:text-base font-medium"
+                    className="text-[#A33149] text-xs sm:text-sm md:text-sm lg:text-base font-medium"
                     style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '600' }}
                   >
                     ngày
@@ -144,7 +144,7 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
 
                 {/* Male Column */}
                 <div className="flex flex-col items-center min-w-0">
-                  <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-20 md:h-20 lg:w-24 lg:h-24 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
                     <img
                       src={resolveImageUrl(preloadedData.homepageData.avatar_male)}
                       className="w-full h-full object-cover rounded-full animate-spin-slow motion-reduce:animate-none shrink-0"
@@ -152,7 +152,7 @@ export const HomepageView: React.FC<HomepageViewProps> = ({
                     />
                   </div>
                   <p
-                    className="w-full text-center text-[#A33149] text-base md:text-xl font-bold truncate mt-1.5 px-1 leading-normal"
+                    className="w-full text-center text-[#A33149] text-sm sm:text-base md:text-sm lg:text-lg font-bold truncate mt-1.5 px-0.5 leading-normal"
                     style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '700' }}
                     title={preloadedData.ecardData.male_name}
                   >

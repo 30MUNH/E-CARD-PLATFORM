@@ -122,18 +122,18 @@ export const PinScreen: React.FC<PinScreenProps> = ({
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center text-[#8A2B3D] bg-[#FAF7F2] bg-[url('/template/background-template.jpg')] bg-cover bg-center px-4">
-      <div className="flex flex-col items-center justify-center w-full max-w-sm md:max-w-md p-6">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-2 text-center text-[#8A2B3D]">{heading}</h2>
-        <p className="mb-6 text-center text-[#8A2B3D] text-sm md:text-base">{subheading}</p>
+      <div className="flex flex-col items-center justify-center w-full max-w-sm md:max-w-md lg:max-w-lg p-6 md:p-10 lg:p-12 md:bg-white/80 md:backdrop-blur-md md:rounded-3xl md:shadow-2xl md:border md:border-rose-100/90">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-2 text-center text-[#8A2B3D]">{heading}</h2>
+        <p className="mb-6 md:mb-8 text-center text-[#8A2B3D] text-sm md:text-base lg:text-lg">{subheading}</p>
         <div
-          className={`flex gap-4 mb-8 transition-transform ${
+          className={`flex gap-4 md:gap-5 mb-8 md:mb-10 transition-transform ${
             hasErrorFeedback ? 'scale-105' : ''
           }`}
         >
           {[0, 1, 2, 3].map((idx) => (
             <div
               key={idx}
-              className={`w-4 h-4 rounded-full border-2 transition-colors ${
+              className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 transition-colors ${
                 pin.length > idx
                   ? 'bg-[#8A2B3D] border-[#8A2B3D]'
                   : 'border-[#8A2B3D]'
@@ -141,14 +141,14 @@ export const PinScreen: React.FC<PinScreenProps> = ({
             />
           ))}
         </div>
-        <div className="grid grid-cols-3 gap-4 md:gap-5 w-full max-w-[280px]">
+        <div className="grid grid-cols-3 gap-4 md:gap-6 w-full max-w-[280px] md:max-w-[340px]">
           {KEYPAD_DIGITS.map((digit) => (
             <button
               key={digit}
               type="button"
               onClick={() => handleDigitClick(digit)}
               onTouchStart={onTouchStart}
-              className="w-16 h-16 md:w-[68px] md:h-[68px] rounded-full border border-[#8A2B3D]/70 text-[#8A2B3D] text-xl font-normal hover:bg-[#8A2B3D]/10 active:scale-95 transition flex items-center justify-center mx-auto"
+              className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-[#8A2B3D]/70 text-[#8A2B3D] text-xl md:text-2xl font-normal hover:bg-[#8A2B3D]/10 active:scale-95 transition flex items-center justify-center mx-auto"
             >
               {digit}
             </button>
@@ -158,7 +158,7 @@ export const PinScreen: React.FC<PinScreenProps> = ({
             type="button"
             onClick={() => handleDigitClick('0')}
             onTouchStart={onTouchStart}
-            className="w-16 h-16 md:w-[68px] md:h-[68px] rounded-full border border-[#8A2B3D]/70 text-[#8A2B3D] text-xl font-normal hover:bg-[#8A2B3D]/10 active:scale-95 transition flex items-center justify-center mx-auto"
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-[#8A2B3D]/70 text-[#8A2B3D] text-xl md:text-2xl font-normal hover:bg-[#8A2B3D]/10 active:scale-95 transition flex items-center justify-center mx-auto"
           >
             0
           </button>
@@ -167,7 +167,7 @@ export const PinScreen: React.FC<PinScreenProps> = ({
             onClick={handleDelete}
             onTouchStart={onTouchStart}
             disabled={pin.length === 0}
-            className="text-sm underline text-[#8A2B3D] disabled:opacity-40 flex items-center justify-center"
+            className="text-sm md:text-base underline text-[#8A2B3D] disabled:opacity-40 flex items-center justify-center font-medium"
           >
             Xóa
           </button>

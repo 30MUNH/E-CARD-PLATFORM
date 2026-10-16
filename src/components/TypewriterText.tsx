@@ -40,12 +40,12 @@ export const TypewriterText: React.FC<TypewriterTextProps> = ({ letters }) => {
   return (
     <>
       {completedLines.map((line, idx) => (
-        <p key={idx} style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}>
+        <p key={idx} style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '600' }}>
           {line}
         </p>
       ))}
       {currentLineIndex < letters.length && (
-        <p style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}>{currentText}</p>
+        <p style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '600' }}>{currentText}</p>
       )}
     </>
   );

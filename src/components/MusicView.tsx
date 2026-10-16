@@ -298,7 +298,7 @@ export const MusicView: React.FC<MusicViewProps> = ({
             <div className="text-sm md:text-base">{artistLabel}</div>
             <div
               className="text-2xl md:text-3xl lg:text-4xl text-white py-2"
-              style={{ fontFamily: 'Pacifico, cursive', fontWeight: '400' }}
+              style={{ fontFamily: "'Dancing Script', 'Pacifico', cursive", fontWeight: '700' }}
             >
               {musicItem.title || ''}
             </div>
