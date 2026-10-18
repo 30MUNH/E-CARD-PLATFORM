@@ -8,10 +8,13 @@ import { validateFrontendOrigins } from './http.ts';
 const supabaseUrl = Deno.env.get('SUPABASE_URL');
 const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 if (!supabaseUrl || !serviceRoleKey) throw new Error('Supabase server configuration is incomplete');
-const frontendOrigins = validateFrontendOrigins(
-  Deno.env.get('FRONTEND_ORIGINS') ?? undefined,
-  Deno.env.get('FRONTEND_ORIGIN') ?? undefined
-);
+const frontendOrigins = [
+  ...validateFrontendOrigins(
+    Deno.env.get('FRONTEND_ORIGINS') ?? undefined,
+    Deno.env.get('FRONTEND_ORIGIN') ?? undefined
+  ),
+  'https://e-card-platform-gamma.vercel.app',
+];
 const client = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
