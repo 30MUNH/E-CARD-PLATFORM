@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Lock, ShieldAlert, Unlock } from 'lucide-react';
 import { useEditor } from '../context/EditorContext';
+import { getCardAccessService } from '../../services';
 
 export const AccessSettingsSection: React.FC = () => {
   const { draft, updateDraft, pinForm, setPinForm } = useEditor();
+  const isMockMode = getCardAccessService().isMockMode;
   const [showPinText, setShowPinText] = useState(false);
 
   const sanitizeDigits = (val: string) => val.replace(/\D/g, '').slice(0, 4);
@@ -57,14 +59,16 @@ export const AccessSettingsSection: React.FC = () => {
         </div>
 
         {/* Security & Integration Boundary Banner */}
-        <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 flex items-start gap-3">
-          <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-xs text-amber-900 space-y-1">
+        <div className={`rounded-xl border p-4 flex items-start gap-3 ${isMockMode ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200'}`}>
+          <ShieldAlert className={`w-5 h-5 shrink-0 mt-0.5 ${isMockMode ? 'text-amber-600' : 'text-emerald-600'}`} />
+          <div className={`text-xs space-y-1 ${isMockMode ? 'text-amber-900' : 'text-emerald-900'}`}>
             <div className="font-bold">
-              Chính sách Bảo mật PIN (Chờ tích hợp Backend OpenAI Codex)
+              {isMockMode ? 'PIN chỉ dùng để xem thử' : 'PIN được xác thực an toàn trên máy chủ'}
             </div>
-            <p className="text-amber-800 leading-relaxed">
-              Mã PIN chỉ được kiểm tra định dạng trên giao diện và <strong>không bao giờ</strong> lưu dưới dạng văn bản thuần trong <code>localStorage</code>, cấu hình tĩnh hay cơ sở dữ liệu giả lập. Khi kết nối Backend, mã PIN sẽ được băm bảo mật và xác thực phía máy chủ (không giới hạn số lần thử lại trên giao diện người nhận).
+            <p className={`leading-relaxed ${isMockMode ? 'text-amber-800' : 'text-emerald-800'}`}>
+              {isMockMode
+                ? <>Mã PIN chỉ được kiểm tra trong dữ liệu mẫu của trình duyệt; đây không phải chế độ bảo vệ để phát hành thiệp thật.</>
+                : <>Mã PIN được băm và xác thực trên Supabase. Thiệp chỉ trả nội dung riêng tư sau khi máy chủ cấp quyền truy cập.</>}
             </p>
           </div>
         </div>

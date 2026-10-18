@@ -4,6 +4,7 @@ import { PublishCardResult } from '../../types/ecard';
 
 interface PublishingControlsProps {
   cardId: string | null;
+  isMockMode: boolean;
   isDirty: boolean;
   lastSavedAt: string | null;
   onSaveDraft: () => Promise<void>;
@@ -14,6 +15,7 @@ interface PublishingControlsProps {
 
 export const PublishingControls: React.FC<PublishingControlsProps> = ({
   cardId,
+  isMockMode,
   isDirty,
   lastSavedAt,
   onSaveDraft,
@@ -75,9 +77,9 @@ export const PublishingControls: React.FC<PublishingControlsProps> = ({
             </div>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-semibold self-start sm:self-center">
-            <Wrench className="w-3.5 h-3.5" />
-            <span>Backend Integration Pending (Codex)</span>
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold self-start sm:self-center ${isMockMode ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
+            {isMockMode ? <Wrench className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+            <span>{isMockMode ? 'Chế độ xem thử' : 'Dữ liệu thật · Supabase'}</span>
           </span>
         </div>
 
@@ -127,18 +129,20 @@ export const PublishingControls: React.FC<PublishingControlsProps> = ({
 
         {/* Explicit Integration Pending Feedback on Publish */}
         {publishNotice && (
-          <div className="rounded-2xl bg-amber-50 border border-amber-300 p-5 space-y-2">
-            <div className="flex items-center gap-2 text-sm font-bold text-amber-900">
-              <CheckCircle2 className="w-5 h-5 text-amber-700" />
-              <span>Đã cập nhật trạng thái Demo — Chờ tích hợp Backend (OpenAI Codex)</span>
+          <div className={`rounded-2xl border p-5 space-y-2 ${publishNotice.integrationPending ? 'bg-amber-50 border-amber-300' : 'bg-emerald-50 border-emerald-300'}`}>
+            <div className={`flex items-center gap-2 text-sm font-bold ${publishNotice.integrationPending ? 'text-amber-900' : 'text-emerald-900'}`}>
+              <CheckCircle2 className={`w-5 h-5 ${publishNotice.integrationPending ? 'text-amber-700' : 'text-emerald-700'}`} />
+              <span>{publishNotice.integrationPending ? 'Đã xuất bản bản xem thử' : 'Thiệp đã được xuất bản'}</span>
             </div>
-            <p className="text-xs text-amber-800 leading-relaxed">{publishNotice.message}</p>
+            <p className={`text-xs leading-relaxed ${publishNotice.integrationPending ? 'text-amber-800' : 'text-emerald-800'}`}>{publishNotice.message}</p>
             {publishNotice.publicUrl && (
-              <div className="pt-1 text-xs font-mono text-amber-900">
-                Đường dẫn nội bộ xem thử:{' '}
+              <div className={`pt-1 text-xs font-mono ${publishNotice.integrationPending ? 'text-amber-900' : 'text-emerald-900'}`}>
+                {publishNotice.integrationPending ? 'Đường dẫn xem thử:' : 'Link công khai:'}{' '}
                 <a
                   href={publishNotice.publicUrl}
                   className="underline font-semibold text-[#A33149]"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   {publishNotice.publicUrl}
                 </a>

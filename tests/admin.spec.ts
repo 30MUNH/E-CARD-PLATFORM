@@ -54,7 +54,7 @@ test.describe('Admin E-Card Platform Dashboard, Editor & Live Preview Suite', ()
     ).toHaveCount(0);
   });
 
-  test('3. Multi-Section Card Editor (/admin/cards/new) edits all 6 sections and shows explicit integration-pending state on Publish', async ({
+  test('3. Multi-Section Card Editor (/admin/cards/new) edits all 6 sections and clearly labels mock publishing', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -90,11 +90,11 @@ test.describe('Admin E-Card Platform Dashboard, Editor & Live Preview Suite', ()
     await page.locator('#pin-confirm-input').fill('2468');
     await expect(page.locator('text=✓ Mã PIN 4 số hợp lệ và đã khớp.')).toBeVisible();
 
-    // Section 6: Publishing Controls -> Explicit Integration Pending Notice
+    // Section 6: Publishing Controls -> Explicit mock-only notice
     await page.locator('button[role="tab"]:has-text("6. Xuất bản")').click();
     await page.locator('button:has-text("Xuất Bản Thiệp (Publish)")').click();
     await expect(
-      page.locator('text=Đã cập nhật trạng thái Demo — Chờ tích hợp Backend (OpenAI Codex)')
+      page.locator('text=Đã xuất bản bản xem thử')
     ).toBeVisible();
   });
 

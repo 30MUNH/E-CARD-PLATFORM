@@ -68,8 +68,11 @@ export const DashboardPage: React.FC = () => {
 
   const handleArchive = async (cardId: string) => {
     try {
-      await getCardRepository().archiveCard(cardId);
-      toast.success('Đã chuyển thiệp vào mục Lưu trữ (Chế độ Demo)');
+      const repository = getCardRepository();
+      await repository.archiveCard(cardId);
+      toast.success(repository.isMockMode
+        ? 'Đã chuyển thiệp mẫu vào mục Lưu trữ'
+        : 'Đã chuyển thiệp vào mục Lưu trữ trên Supabase');
       await loadCards();
     } catch {
       toast.error('Không thể lưu trữ thiệp');
