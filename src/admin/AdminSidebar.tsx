@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   ExternalLink,
@@ -10,6 +10,8 @@ import {
   X,
 } from 'lucide-react';
 import { DEFAULT_ECARD_UUID } from '../data/ecardData';
+import { getCardRepository } from '../services';
+import { isApiMode } from '../services/api/config';
 
 interface AdminSidebarProps {
   isOpenMobile: boolean;
@@ -47,6 +49,32 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   isOpenMobile,
   onCloseMobile,
 }) => {
+  const apiMode = isApiMode();
+  const [publishedCardPath, setPublishedCardPath] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!apiMode) return;
+    let cancelled = false;
+    void getCardRepository()
+      .listCards({ status: 'published' })
+      .then((cards) => {
+        if (cancelled) return;
+        const card = cards[0];
+        if (!card) return;
+        const publicPath = card.publicUrl
+          ? new URL(card.publicUrl, window.location.origin).pathname
+          : `/ecd/game/${card.id}`;
+        setPublishedCardPath(publicPath);
+      })
+      .catch(() => {
+        if (!cancelled) setPublishedCardPath(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [apiMode]);
+
   return (
     <>
       {isOpenMobile && (
@@ -107,20 +135,35 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         </nav>
 
         <div className="p-4 border-t border-slate-200 space-y-3">
-          <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">
-            <div className="font-semibold mb-0.5">Chế độ Frontend Mock</div>
-            <p className="text-amber-700 leading-relaxed">
-              Lưu trữ DB, xác thực PIN máy chủ và xuất bản link công khai đang chờ tích hợp từ OpenAI Codex.
+          <div className={`rounded-xl border p-3 text-xs ${apiMode ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
+            <div className="font-semibold mb-0.5">
+              {apiMode ? 'Nguồn dữ liệu: API / Supabase' : 'Chế độ xem thử'}</div>
+            <p className={`${apiMode ? 'text-emerald-700' : 'text-amber-700'} leading-relaxed`}>
+              {apiMode
+                ? 'Danh sách thiệp và nội dung được tải từ dữ liệu đã lưu trên máy chủ.'
+                : 'Đang dùng dữ liệu mẫu trên trình duyệt; hãy bật API mode để dùng dữ liệu thật.'}
             </p>
           </div>
 
-          <NavLink
-            to={`/ecd/game/${DEFAULT_ECARD_UUID}`}
-            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition"
-          >
-            <span>Mở Thiệp Mẫu Người Nhận</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </NavLink>
+          {apiMode ? (
+            <a
+              href={publishedCardPath || '/admin/cards'}
+              target={publishedCardPath ? '_blank' : undefined}
+              rel={publishedCardPath ? 'noopener noreferrer' : undefined}
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition"
+            >
+              <span>{publishedCardPath ? 'Mở thiệp đã xuất bản' : 'Quản lý thiệp đã lưu'}</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          ) : (
+            <NavLink
+              to={`/ecd/game/${DEFAULT_ECARD_UUID}`}
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition"
+            >
+              <span>Mở thiệp mẫu xem thử</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </NavLink>
+          )}
         </div>
       </aside>
     </>

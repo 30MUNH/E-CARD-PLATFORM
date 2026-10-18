@@ -149,7 +149,7 @@ export const App: React.FC = () => {
           <Routes>
             <Route
               path="/"
-              element={<Navigate to={`/ecd/game/${DEFAULT_ECARD_UUID}`} replace />}
+              element={<Navigate to="/admin/login" replace />}
             />
             {/* Recipient Experience Routes */}
             <Route path="/ecd/game/:uuid" element={<RecipientEcardRoute />} />
