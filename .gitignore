@@ -38,6 +38,9 @@ reference/recordings/
 # Private customer media cache
 public/user-media/
 
+# Supabase CLI project linkage and local state
+supabase/.temp/
+
 # Local isolated development worktrees
 .worktrees/
 .superpowers/

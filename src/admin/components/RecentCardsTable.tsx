@@ -113,7 +113,7 @@ export const RecentCardsTable: React.FC<RecentCardsTableProps> = ({
               const publicPath = card.publicUrl || `/ecd/game/${card.id}`;
               const fullPublicUrl =
                 typeof window !== 'undefined'
-                  ? `${window.location.origin}${publicPath}`
+                  ? new URL(publicPath, window.location.origin).href
                   : publicPath;
               const isCopied = copiedId === card.id;
 
@@ -130,7 +130,10 @@ export const RecentCardsTable: React.FC<RecentCardsTableProps> = ({
                         {card.senderName} ❤️ {card.recipientName}
                       </span>
                       <span>•</span>
-                      <span>{card.photoCount} ảnh</span>
+                      <span className="max-w-48 truncate" title={card.albumPdfFilename || undefined}>
+                        {card.albumPdfFilename ? `PDF: ${card.albumPdfFilename}` : 'Chưa có sách PDF'}
+                      </span>
+                      {card.photoCount > 0 && <span>{card.photoCount} ảnh (cũ)</span>}
                       <span className="lg:hidden">•</span>
                       <span className="lg:hidden">
                         {new Date(card.createdAt).toLocaleDateString('vi-VN')}
@@ -142,10 +145,10 @@ export const RecentCardsTable: React.FC<RecentCardsTableProps> = ({
                   <td className="py-2 lg:py-4 lg:px-4">
                     <div className="flex items-center gap-1.5">
                       <span
-                        className="font-mono text-xs text-slate-700 bg-slate-100 hover:bg-slate-200/80 px-2.5 py-1 rounded-lg border border-slate-200 truncate max-w-[200px]"
+                        className="font-mono text-xs text-slate-700 bg-slate-100 hover:bg-slate-200/80 px-2.5 py-1 rounded-lg border border-slate-200 break-all max-w-[320px]"
                         title={fullPublicUrl}
                       >
-                        {publicPath}
+                        {fullPublicUrl}
                       </span>
                       <button
                         type="button"
@@ -167,7 +170,7 @@ export const RecentCardsTable: React.FC<RecentCardsTableProps> = ({
                         )}
                       </button>
                       <a
-                        href={publicPath}
+                        href={fullPublicUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-1.5 rounded-lg text-slate-500 hover:text-[#A33149] hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition shrink-0"

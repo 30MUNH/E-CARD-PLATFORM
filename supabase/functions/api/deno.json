@@ -1,0 +1,17 @@
+{
+  "imports": {
+    "./app.ts": "./app.ts",
+    "./app.js": "./app.ts",
+    "./auth.js": "./auth.ts",
+    "./http.js": "./http.ts",
+    "./media.js": "./media.ts",
+    "./repository.js": "./repository.ts",
+    "./validation.js": "./validation.ts",
+    "./domain/index.js": "./domain/index.ts",
+    "./domain/errors.js": "./domain/errors.ts",
+    "./domain/pin.js": "./domain/pin.ts",
+    "./domain/sessions.js": "./domain/sessions.ts",
+    "./domain/mediaReferences.js": "./domain/mediaReferences.ts",
+    "./domain/validation.js": "./domain/validation.ts"
+  }
+}

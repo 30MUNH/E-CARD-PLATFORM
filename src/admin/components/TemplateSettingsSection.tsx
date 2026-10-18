@@ -12,8 +12,8 @@ const CONFIGURABLE_SLIDES: Array<{ id: SlideId; label: string; description: stri
   },
   {
     id: 'album',
-    label: 'Album Ảnh (Photo Album)',
-    description: 'Bố cục ảnh kỷ niệm nghệ thuật tự động sắp xếp theo thứ tự tải lên.',
+    label: 'Sách lật PDF',
+    description: 'Tải một file PDF để người nhận xem như sách lật trang.',
   },
   {
     id: 'music',
@@ -90,7 +90,7 @@ export const TemplateSettingsSection: React.FC = () => {
           <div>
             <h2 className="text-lg font-bold text-slate-900">Lựa chọn Giao diện (Template)</h2>
             <p className="text-xs text-slate-500">
-              Chọn mẫu thiết kế chủ đạo cho thiệp. Giao diện gốc By.Duni được bảo toàn làm mẫu mặc định.
+              Chọn mẫu thiết kế chủ đạo cho thiệp SONG HÀNH KÝ.
             </p>
           </div>
         </div>

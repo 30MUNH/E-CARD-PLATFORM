@@ -1,0 +1,10 @@
+project_id = "e-card-platform"
+
+[api]
+enabled = true
+
+[db]
+port = 54322
+
+[functions.api]
+verify_jwt = false

@@ -91,12 +91,12 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     await expect(backBtn).toHaveCount(0);
 
     await nextBtn.click();
-    await expect(page.locator('img[alt="group1-img0"]')).toBeVisible();
+    await expect(page.locator('text=Chưa có sách PDF')).toBeVisible();
     await expect(backBtn).toBeVisible();
 
     await nextBtn.click();
     await expect(page.locator('text=Một Đời')).toBeVisible();
-    await expect(page.locator('text=Duni')).toBeVisible();
+    await expect(page.locator('text=SONG HÀNH KÝ').first()).toBeVisible();
 
     await nextBtn.click();
     await expect(page.locator('svg clipPath#heartClip')).toHaveCount(2);
@@ -111,7 +111,7 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     await expect(page.locator('text=Một Đời')).toBeVisible();
 
     await backBtn.click();
-    await expect(page.locator('img[alt="group1-img0"]')).toBeVisible();
+    await expect(page.locator('text=Chưa có sách PDF')).toBeVisible();
 
     await backBtn.click();
     await expect(page.locator('text=Ngọc Khánh').first()).toBeVisible();
@@ -134,7 +134,7 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     const backBtn = page.locator('button img[src="/template/back.png"]').locator('..');
 
     await page.locator('button img[alt="big"]').locator('..').click();
-    await expect(page.locator('img[alt="group1-img0"]')).toBeVisible();
+    await expect(page.locator('text=Chưa có sách PDF')).toBeVisible();
     await backBtn.click();
 
     await page.locator('button img[alt="music"]').locator('..').click();
@@ -148,7 +148,7 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     const sidebarBtn = page.locator('button img[alt="sidebar"]').locator('..');
     await sidebarBtn.click();
     await expect(page.locator('button:has-text("Trang chủ")')).toBeVisible();
-    await expect(page.locator('button:has-text("Ảnh")')).toBeVisible();
+    await expect(page.locator('button:has-text("Sách lật PDF")')).toBeVisible();
     await expect(page.locator('button:has-text("Voice")')).toBeVisible();
     await expect(page.locator('button:has-text("Lá thư")')).toBeVisible();
     await expect(page.locator('button:has-text("Game")')).toBeVisible();
@@ -160,58 +160,15 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     await expect(page.locator('text=Hướng dẫn chơi:')).toBeVisible();
   });
 
-  test('4. Album collage layout, Lightbox modal, captions, and mobile touch swipe', async ({
+  test('4. Album slide shows the PDF flipbook empty state until a document is uploaded', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await unlockEcard(page);
 
     await page.locator('button img[alt="big"]').locator('..').click();
-    await expect(page.locator('img[alt="group1-img0"]')).toBeVisible();
-    await expect(page.locator('img[alt="group1-img1"]')).toBeVisible();
-    await expect(page.locator('img[alt="group1-img2"]')).toBeVisible();
-
-    const loadedCount = await page.evaluate(() => {
-      const imgs = Array.from(document.querySelectorAll('img[alt^="group"]')) as HTMLImageElement[];
-      return imgs.filter((img) => img.complete && img.naturalWidth > 0).length;
-    });
-    expect(loadedCount).toBe(7);
-
-    await page.locator('img[alt="group1-img0"]').click();
-    const expandedImg = page.locator('img[alt="expanded"]');
-    await expect(expandedImg).toBeVisible();
-    await expect(page.locator('.fixed.inset-0').getByText('hẹ hẹ')).toBeVisible();
-
-    const overlay = page.locator('.fixed.inset-0.bg-black.bg-opacity-80');
-    await overlay.evaluate((el) => {
-      const tStart = new Touch({ identifier: 1, target: el, screenX: 300, screenY: 400 });
-      const tEnd = new Touch({ identifier: 1, target: el, screenX: 100, screenY: 400 });
-      el.dispatchEvent(
-        new TouchEvent('touchstart', {
-          bubbles: true,
-          cancelable: true,
-          changedTouches: [tStart],
-        })
-      );
-      el.dispatchEvent(
-        new TouchEvent('touchmove', {
-          bubbles: true,
-          cancelable: true,
-          changedTouches: [tEnd],
-        })
-      );
-      el.dispatchEvent(
-        new TouchEvent('touchend', {
-          bubbles: true,
-          cancelable: true,
-          changedTouches: [tEnd],
-        })
-      );
-    });
-    await expect(page.locator('.fixed.inset-0').getByText('chinh nhật zui zeee')).toBeVisible();
-
-    await overlay.click({ position: { x: 10, y: 10 } });
-    await expect(expandedImg).toHaveCount(0);
+    await expect(page.locator('[aria-label="Sách lật PDF"]')).toBeVisible();
+    await expect(page.locator('text=Chưa có sách PDF')).toBeVisible();
   });
 
   test('5. Music player UI controls and Letter typewriter + SVG heart-clipped avatars', async ({
@@ -349,7 +306,7 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
       viewport: { width: 390, height: 844 },
     });
     const page = await context.newPage();
-    await page.goto(`http://127.0.0.1:5173${ECARD_PATH}`);
+    await page.goto(`http://127.0.0.1:5180${ECARD_PATH}`);
     await expect(page.locator('text=Chuyển trình duyệt')).toBeVisible();
     await expect(
       page.locator('text=Để có trải nghiệm tốt nhất, vui lòng mở trang web này trong trình duyệt mặc định của bạn.')
@@ -390,8 +347,8 @@ test.describe('Complete E-Card E2E, Interaction & Responsive Recipient Suite', (
     await unlockEcard(page);
 
     // Click progress dot for Album
-    await page.locator('button[aria-label="Chuyển tới mục Ảnh"]').click();
-    await expect(page.locator('img[alt="group1-img0"]')).toBeVisible();
+    await page.locator('button[aria-label="Chuyển tới mục Sách lật PDF"]').click();
+    await expect(page.locator('text=Chưa có sách PDF')).toBeVisible();
 
     // Click progress dot for Voice
     await page.locator('button[aria-label="Chuyển tới mục Voice"]').click();

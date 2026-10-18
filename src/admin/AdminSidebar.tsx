@@ -67,8 +67,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               <Heart className="w-5 h-5 fill-current" />
             </div>
             <div>
-              <div className="font-bold text-slate-900 leading-tight">By.Duni Studio</div>
-              <div className="text-[11px] font-medium text-slate-500">E-Card Admin Platform</div>
+              <div className="font-bold text-slate-900 leading-tight">SONG HÀNH KÝ</div>
+              <div className="text-[11px] font-medium text-slate-500">Thiệp kỷ niệm</div>
             </div>
           </div>
 

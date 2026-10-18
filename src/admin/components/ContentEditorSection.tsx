@@ -1,6 +1,5 @@
 import React from 'react';
 import { CalendarHeart, MessageSquareHeart, Plus, Sparkles, Trash2 } from 'lucide-react';
-import { resolveImageUrl } from '../../data/ecardData';
 import { useEditor } from '../context/EditorContext';
 
 export const ContentEditorSection: React.FC = () => {
@@ -177,48 +176,6 @@ export const ContentEditorSection: React.FC = () => {
               >
                 <Trash2 className="w-4 h-4" />
               </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Individual Photo Captions Editor */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900">
-            Chú thích từng bức ảnh trong Album ({draft.albumData.length} ảnh)
-          </h2>
-          <p className="text-xs text-slate-500">
-            Chú thích hiển thị dưới ảnh khi người nhận chạm để phóng to ảnh trong Lightbox.
-          </p>
-        </div>
-
-        <div className="divide-y divide-slate-100">
-          {draft.albumData.map((item, idx) => (
-            <div key={item.id || idx} className="py-3 flex items-center gap-3">
-              <img
-                src={resolveImageUrl(item.image_url)}
-                alt={`Thumb ${idx + 1}`}
-                className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0"
-              />
-              <div className="flex-1">
-                <label className="block text-[11px] font-semibold text-slate-500 mb-1">
-                  Ảnh #{idx + 1}
-                </label>
-                <input
-                  type="text"
-                  value={item.caption}
-                  onChange={(e) =>
-                    updateDraft((prev) => ({
-                      ...prev,
-                      albumData: prev.albumData.map((a, i) =>
-                        i === idx ? { ...a, caption: e.target.value } : a
-                      ),
-                    }))
-                  }
-                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#A33149]"
-                />
-              </div>
             </div>
           ))}
         </div>

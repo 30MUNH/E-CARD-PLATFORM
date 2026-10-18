@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import {
-  ArrowDown,
-  ArrowUp,
+  FileText,
   ImagePlus,
   Music,
   Trash2,
@@ -11,56 +10,76 @@ import {
 } from 'lucide-react';
 import { resolveImageUrl } from '../../data/ecardData';
 import { getMediaService } from '../../services';
+import { PdfAssetDescriptor } from '../../types/ecard';
+
+const PdfFlipbook = React.lazy(() =>
+  import('../../components/PdfFlipbook').then((module) => ({ default: module.PdfFlipbook }))
+);
 import { useEditor } from '../context/EditorContext';
 
 export const MediaUploadSection: React.FC = () => {
-  const { draft, updateDraft } = useEditor();
+  const { draft, updateDraft, editingCardId } = useEditor();
   const [uploadFeedback, setUploadFeedback] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isPdfUploading, setIsPdfUploading] = useState(false);
 
-  const handleAlbumFilesSelected = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  const handlePdfFileSelected = async (file: File | undefined) => {
+    if (!file) return;
     setUploadError(null);
     const mediaService = getMediaService();
-    const uploadedItems: Array<{ id: string; url: string; name: string; sizeBytes: number }> = [];
-
-    for (const file of Array.from(files)) {
-      const check = mediaService.validateFile(file, 'image');
-      if (!check.valid) {
-        setUploadError(check.error || 'Tệp ảnh không hợp lệ');
-        toast.error(check.error || 'Tệp ảnh không hợp lệ');
-        continue;
-      }
-      const asset = await mediaService.uploadMedia(file, 'image');
-      uploadedItems.push({
-        id: asset.id,
-        url: asset.url,
-        name: asset.filename,
-        sizeBytes: asset.sizeBytes,
-      });
+    const validation = mediaService.validateFile(file, 'pdf');
+    if (!validation.valid) {
+      const message = validation.error || 'Vui lòng chọn tệp PDF hợp lệ.';
+      setUploadError(message);
+      toast.error(message);
+      return;
     }
 
-    if (uploadedItems.length > 0) {
-      updateDraft((prev) => ({
-        ...prev,
-        albumData: [
-          ...prev.albumData,
-          ...uploadedItems.map((item, idx) => ({
-            id: item.id,
-            ecard_id: 'draft',
-            image_url: item.url,
-            caption: `Kỷ niệm mới #${prev.albumData.length + idx + 1} 💖`,
-            order: prev.albumData.length + idx,
-          })),
-        ],
-      }));
-      const totalKb = Math.round(
-        uploadedItems.reduce((acc, i) => acc + i.sizeBytes, 0) / 1024
-      );
-      setUploadFeedback(
-        `Đã thêm ${uploadedItems.length} ảnh (${totalKb} KB) — Bản xem trước cục bộ (Blob URL).`
-      );
-      toast.success(`Đã tải lên ${uploadedItems.length} ảnh`);
+    if (!mediaService.isMockMode && (!editingCardId || editingCardId === 'new')) {
+      const message = 'Hãy lưu bản nháp trước khi tải ảnh, ghi âm hoặc PDF lên.';
+      setUploadError(message);
+      toast.error(message);
+      return;
+    }
+
+    setIsPdfUploading(true);
+    setUploadFeedback(null);
+    try {
+      const uploaded = await mediaService.uploadMedia(file, 'pdf', editingCardId || undefined);
+      const descriptor: PdfAssetDescriptor = {
+        id: uploaded.id,
+        url: uploaded.url,
+        filename: uploaded.filename,
+        mimeType: 'application/pdf',
+        sizeBytes: uploaded.sizeBytes,
+        isLocalPreview: uploaded.isLocalPreview,
+      };
+      const replacedAsset = draft.albumPdf;
+      updateDraft((prev) => ({ ...prev, albumPdf: descriptor }));
+      if (replacedAsset?.isLocalPreview) {
+        await mediaService.deleteMedia(replacedAsset.id);
+      }
+      const sizeMb = (uploaded.sizeBytes / (1024 * 1024)).toFixed(1);
+      const message = uploaded.isLocalPreview
+        ? `Đã tải ${uploaded.filename} (${sizeMb} MB). Bản xem trước cục bộ; link khách hàng cần kho lưu trữ backend.`
+        : `Đã tải ${uploaded.filename} (${sizeMb} MB).`;
+      setUploadFeedback(message);
+      toast.success('Đã cập nhật sách PDF');
+    } catch (uploadError) {
+      const message = uploadError instanceof Error ? uploadError.message : 'Không thể tải PDF lên.';
+      setUploadError(message);
+      toast.error(message);
+    } finally {
+      setIsPdfUploading(false);
+    }
+  };
+
+  const removePdf = async () => {
+    const currentAsset = draft.albumPdf;
+    updateDraft((prev) => ({ ...prev, albumPdf: null }));
+    setUploadFeedback(null);
+    if (currentAsset?.isLocalPreview) {
+      await getMediaService().deleteMedia(currentAsset.id);
     }
   };
 
@@ -76,37 +95,40 @@ export const MediaUploadSection: React.FC = () => {
       toast.error(check.error || 'Tệp ảnh không hợp lệ');
       return;
     }
-    const asset = await mediaService.uploadMedia(file, 'image');
-    updateDraft((prev) => {
-      if (target === 'music_cover') {
-        const currentMusic = prev.musicData[0] || {
-          id: 'music-1',
-          ecard_id: 'draft',
-          youtube_id: 'JgTZvDbaTtg',
-          title: 'Một Đời',
-          artist: 'Duni',
-          quote: 'Love you to the saturn and back',
-          created_at: new Date().toISOString(),
-          updated_at: null,
-          image_url: asset.url,
-          caption: null,
-          is_deleted: false,
-          deleted_at: null,
-        };
-        return {
-          ...prev,
-          musicData: [{ ...currentMusic, image_url: asset.url }],
-        };
-      }
-      return {
-        ...prev,
-        homepageData: {
-          ...prev.homepageData,
-          [target]: asset.url,
-        },
-      };
-    });
-    toast.success(`Đã cập nhật ảnh (${file.name})`);
+    if (!mediaService.isMockMode && (!editingCardId || editingCardId === 'new')) {
+      const message = 'Hãy lưu bản nháp trước khi tải ảnh lên.';
+      setUploadError(message);
+      toast.error(message);
+      return;
+    }
+    try {
+      const asset = await mediaService.uploadMedia(file, 'image', editingCardId || undefined);
+      updateDraft((prev) => {
+        if (target === 'music_cover') {
+          const currentMusic = prev.musicData[0] || {
+            id: 'music-1',
+            ecard_id: 'draft',
+            youtube_id: 'JgTZvDbaTtg',
+            title: 'Một Đời',
+            artist: 'SONG HÀNH KÝ',
+            quote: 'Love you to the saturn and back',
+            created_at: new Date().toISOString(),
+            updated_at: null,
+            image_url: asset.url,
+            caption: null,
+            is_deleted: false,
+            deleted_at: null,
+          };
+          return { ...prev, musicData: [{ ...currentMusic, image_url: asset.url }] };
+        }
+        return { ...prev, homepageData: { ...prev.homepageData, [target]: asset.url } };
+      });
+      toast.success(`Đã cập nhật ảnh (${file.name})`);
+    } catch (uploadError) {
+      const message = uploadError instanceof Error ? uploadError.message : 'Không thể tải ảnh lên.';
+      setUploadError(message);
+      toast.error(message);
+    }
   };
 
   const handleAudioFileUpload = async (file: File | undefined) => {
@@ -119,8 +141,15 @@ export const MediaUploadSection: React.FC = () => {
       toast.error(check.error || 'Tệp âm thanh không hợp lệ');
       return;
     }
-    const asset = await mediaService.uploadMedia(file, 'audio');
-    updateDraft((prev) => {
+    if (!mediaService.isMockMode && (!editingCardId || editingCardId === 'new')) {
+      const message = 'Hãy lưu bản nháp trước khi tải ghi âm lên.';
+      setUploadError(message);
+      toast.error(message);
+      return;
+    }
+    try {
+      const asset = await mediaService.uploadMedia(file, 'audio', editingCardId || undefined);
+      updateDraft((prev) => {
       const firstMusic = prev.musicData[0] || {
         id: 'music-1',
         ecard_id: 'draft',
@@ -150,32 +179,14 @@ export const MediaUploadSection: React.FC = () => {
           audio_url: asset.url,
         },
       };
-    });
-    setUploadFeedback(
-      `Đã đính kèm bản thu âm "${file.name}" (${Math.round(file.size / 1024)} KB).`
-    );
-    toast.success('Đã tải lên bản thu âm');
-  };
-
-  const moveAlbumPhoto = (index: number, direction: -1 | 1) => {
-    const targetIdx = index + direction;
-    if (targetIdx < 0 || targetIdx >= draft.albumData.length) return;
-    updateDraft((prev) => {
-      const next = [...prev.albumData];
-      const [moved] = next.splice(index, 1);
-      next.splice(targetIdx, 0, moved);
-      return {
-        ...prev,
-        albumData: next.map((item, idx) => ({ ...item, order: idx })),
-      };
-    });
-  };
-
-  const removeAlbumPhoto = (index: number) => {
-    updateDraft((prev) => ({
-      ...prev,
-      albumData: prev.albumData.filter((_, i) => i !== index),
-    }));
+      });
+      setUploadFeedback(`Đã đính kèm bản thu âm "${file.name}" (${Math.round(file.size / 1024)} KB).`);
+      toast.success('Đã tải lên bản thu âm');
+    } catch (uploadError) {
+      const message = uploadError instanceof Error ? uploadError.message : 'Không thể tải ghi âm lên.';
+      setUploadError(message);
+      toast.error(message);
+    }
   };
 
   const musicItem = draft.musicData[0];
@@ -273,102 +284,64 @@ export const MediaUploadSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Album Multi-Image Upload & Ordering */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">
-              Album Ảnh Kỷ Niệm ({draft.albumData.length} ảnh)
-            </h2>
+            <h2 className="text-lg font-bold text-slate-900">Sách lật PDF</h2>
             <p className="text-sm text-slate-500 mt-0.5">
-              Hỗ trợ tải lên nhiều ảnh cùng lúc (JPG, PNG, WebP tối đa 10 MB/ảnh). Sắp xếp thứ tự hiển thị hoặc xóa ảnh.
+              Tải một tệp PDF tối đa 50 MB. Tệp được lưu trên kho riêng tư và khách hàng xem dưới dạng sách lật.
             </p>
           </div>
 
-          <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#A33149] hover:bg-[#8e283e] text-white text-sm font-semibold shadow-sm transition self-start">
-            <UploadCloud className="w-4 h-4" />
-            <span>Tải thêm ảnh lên</span>
-            <input
-              type="file"
-              multiple
-              accept="image/jpeg,image/png,image/webp"
-              aria-label="Tải ảnh lên album"
-              className="hidden"
-              onChange={(e) => void handleAlbumFilesSelected(e.target.files)}
-            />
-          </label>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {draft.albumData.map((item, idx) => (
-            <div
-              key={item.id || idx}
-              className="border border-slate-200 rounded-xl p-3 bg-slate-50/60 flex flex-col gap-2.5"
-            >
-              <div className="relative aspect-square rounded-lg overflow-hidden bg-slate-200">
-                <img
-                  src={resolveImageUrl(item.image_url)}
-                  alt={item.caption || `Ảnh ${idx + 1}`}
-                  className="w-full h-full object-cover"
-                />
-                <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-slate-900/75 text-white text-xs font-semibold">
-                  #{idx + 1}
-                </span>
-              </div>
-
+          <div className="flex items-center gap-2">
+            <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#A33149] hover:bg-[#8e283e] text-white text-sm font-semibold shadow-sm transition self-start">
+              <UploadCloud className="w-4 h-4" />
+              <span>{isPdfUploading ? 'Đang tải PDF…' : draft.albumPdf ? 'Thay PDF' : 'Tải PDF lên'}</span>
               <input
-                type="text"
-                value={item.caption}
-                onChange={(e) =>
-                  updateDraft((prev) => ({
-                    ...prev,
-                    albumData: prev.albumData.map((a, i) =>
-                      i === idx ? { ...a, caption: e.target.value } : a
-                    ),
-                  }))
-                }
-                placeholder="Nhập chú thích cho bức ảnh..."
-                aria-label={`Chú thích ảnh ${idx + 1}`}
-                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs focus:outline-none focus:border-[#A33149]"
+                type="file"
+                accept="application/pdf,.pdf"
+                aria-label="Tải sách PDF lên"
+                className="hidden"
+                disabled={isPdfUploading}
+                onChange={(event) => {
+                  void handlePdfFileSelected(event.target.files?.[0]);
+                  event.target.value = '';
+                }}
               />
-
-              <div className="flex items-center justify-between pt-1">
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    disabled={idx === 0}
-                    onClick={() => moveAlbumPhoto(idx, -1)}
-                    aria-label={`Di chuyển ảnh ${idx + 1} lên`}
-                    className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-40"
-                    title="Đưa lên trước"
-                  >
-                    <ArrowUp className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={idx === draft.albumData.length - 1}
-                    onClick={() => moveAlbumPhoto(idx, 1)}
-                    aria-label={`Di chuyển ảnh ${idx + 1} xuống`}
-                    className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-40"
-                    title="Đưa xuống sau"
-                  >
-                    <ArrowDown className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => removeAlbumPhoto(idx)}
-                  aria-label={`Xóa ảnh ${idx + 1}`}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Xóa</span>
-                </button>
-              </div>
-            </div>
-          ))}
+            </label>
+            {draft.albumPdf && (
+              <button
+                type="button"
+                onClick={() => void removePdf()}
+                className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-rose-200 text-rose-700 text-sm font-semibold hover:bg-rose-50 transition"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Xóa</span>
+              </button>
+            )}
+          </div>
         </div>
+
+        {draft.albumPdf && (
+          <div className="flex items-center gap-3 rounded-xl border border-rose-100 bg-rose-50/60 px-4 py-3">
+            <FileText className="w-5 h-5 shrink-0 text-[#8c5261]" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-slate-800">{draft.albumPdf.filename}</p>
+              <p className="text-xs text-slate-500">{(draft.albumPdf.sizeBytes / (1024 * 1024)).toFixed(1)} MB</p>
+            </div>
+            {draft.albumPdf.isLocalPreview && (
+              <span className="shrink-0 rounded-md bg-amber-100 px-2 py-1 text-[10px] font-semibold text-amber-800">
+                Xem trước cục bộ
+              </span>
+            )}
+          </div>
+        )}
+
+        <React.Suspense
+          fallback={<div className="h-[25rem] rounded-xl bg-rose-50/60 animate-pulse" aria-label="Đang tải trình xem PDF" />}
+        >
+          <PdfFlipbook asset={draft.albumPdf} mode="preview" />
+        </React.Suspense>
       </div>
 
       {/* Audio / Voice Section */}

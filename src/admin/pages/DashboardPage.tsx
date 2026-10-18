@@ -84,7 +84,7 @@ export const DashboardPage: React.FC = () => {
             Tổng quan Hệ thống E-Card
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Quản lý, thiết kế và xem trước các thiệp kỹ thuật số cá nhân hóa cho khách hàng By.Duni.
+            Quản lý, thiết kế và xem trước thiệp kỹ thuật số cá nhân hóa từ SONG HÀNH KÝ.
           </p>
         </div>
 

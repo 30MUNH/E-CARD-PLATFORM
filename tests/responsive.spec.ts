@@ -65,7 +65,7 @@ test.describe('Multi-Viewport Responsive Screenshot Verification (Mobile, Tablet
       // 4. Recipient Album
       const nextBtn = page.locator('button img[src="/template/next.png"]').locator('..');
       await nextBtn.click();
-      await expect(page.locator('img[alt="group1-img0"]')).toBeVisible();
+      await expect(page.locator('text=Chưa có sách PDF')).toBeVisible();
       await page.screenshot({
         path: path.join(SCREENSHOT_DIR, `recipient-04-album-${vp.name}.png`),
       });

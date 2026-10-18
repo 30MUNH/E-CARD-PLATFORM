@@ -1,7 +1,7 @@
 # SONG HÀNH KÝ brand and PDF flipbook design
 
 **Date:** 2026-10-18  
-**Status:** Draft for user review  
+**Status:** Approved by user for implementation planning
 **Project:** `/home/tts/Documents/LHA`
 
 ## Goal
@@ -92,4 +92,4 @@ Frontend implementation can provide a working same-session preview with the exis
 - [x] Preserves the existing PIN access boundary.
 - [x] Keeps legacy photo data readable while making PDF the new album experience.
 - [x] Defines actionable behavior and states without binding the product to Heyzine hosting.
-- [ ] User review of this written specification.
+- [x] User approved proceeding to the implementation plan.

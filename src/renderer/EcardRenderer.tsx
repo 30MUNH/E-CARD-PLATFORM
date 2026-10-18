@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Heart } from 'lucide-react';
@@ -12,18 +12,21 @@ import { WelcomeScreen } from '../components/WelcomeScreen';
 import { PinScreen } from '../components/PinScreen';
 import { SidebarDrawer, SidebarToggleButton } from '../components/Sidebar';
 import { HomepageView } from '../components/HomepageView';
-import { AlbumView } from '../components/AlbumView';
 import { MusicView } from '../components/MusicView';
 import { LetterView } from '../components/LetterView';
 import { TimelineView } from '../components/TimelineView';
 import { GameView } from '../components/GameView';
 import { VideoView } from '../components/VideoView';
+import { RecipientMediaRefreshCoordinator } from '../services/api/recipientMediaRefresh';
+
+const PdfFlipbook = lazy(() => import('../components/PdfFlipbook').then((module) => ({ default: module.PdfFlipbook })));
 
 interface SlideStageContentProps {
   onVerifyRedirectSetting?: (ecardId: string) => void;
+  onRefreshMedia?: () => Promise<void>;
 }
 
-const SlideStageContent: React.FC<SlideStageContentProps> = ({ onVerifyRedirectSetting }) => {
+const SlideStageContent: React.FC<SlideStageContentProps> = ({ onVerifyRedirectSetting, onRefreshMedia }) => {
   const {
     config,
     activeSlideIndex,
@@ -56,7 +59,6 @@ const SlideStageContent: React.FC<SlideStageContentProps> = ({ onVerifyRedirectS
     currentSlide.id === 'letter' ||
     currentSlide.id === 'timeline';
 
-  const albumImages = config.albumData.map((item) => item.image_url);
   const hasTimeline = Boolean(config.slideVisibility?.timeline);
   const contentSlides = activeSlides;
 
@@ -151,13 +153,15 @@ const SlideStageContent: React.FC<SlideStageContentProps> = ({ onVerifyRedirectS
               );
             case 'album':
               return (
-                <AlbumView
-                  images={albumImages}
-                  ecardId={ecardId}
-                  preloadedData={config}
-                  onBack={activeSlideIndex > 0 ? goPrevSlide : () => setActiveSlideIndex(0)}
-                  onNext={goNextSlide}
-                />
+                <Suspense fallback={<div className="p-8 text-center text-rose-900">Đang mở sách kỷ niệm…</div>}>
+                  <PdfFlipbook
+                    asset={config.albumPdf ?? null}
+                    mode={isPreviewMode ? 'preview' : 'reader'}
+                    onRefreshAsset={onRefreshMedia}
+                    onBack={goPrevSlide}
+                    onNext={goNextSlide}
+                  />
+                </Suspense>
               );
             case 'music':
               return (
@@ -222,6 +226,9 @@ export interface EcardRendererProps {
   isPreviewMode?: boolean;
   onVerifyPin?: (pin: string) => Promise<PinVerificationResult | boolean>;
   onCardUnlocked?: (unlockedConfig: EcardConfig) => void;
+  onRefreshAuthorizedContent?: () => Promise<EcardConfig>;
+  onRecipientSessionExpired?: () => void;
+  onCardUnavailable?: () => void;
 }
 
 export const EcardRenderer: React.FC<EcardRendererProps> = ({
@@ -231,12 +238,37 @@ export const EcardRenderer: React.FC<EcardRendererProps> = ({
   isPreviewMode = false,
   onVerifyPin,
   onCardUnlocked,
+  onRefreshAuthorizedContent,
+  onRecipientSessionExpired,
+  onCardUnavailable,
 }) => {
   const [currentStep, setCurrentStep] = useState<'welcome' | 'pin' | 'main'>(initialStep);
   const [activeConfig, setActiveConfig] = useState<EcardConfig>(config);
   const playTapSound = useTapSound();
   const { handleUserInteraction } = useMedia();
   const [hasInteracted, setHasInteracted] = useState(false);
+  const mediaRefresh = useMemo(() => onRefreshAuthorizedContent ? new RecipientMediaRefreshCoordinator({
+    refresh: onRefreshAuthorizedContent,
+    onRefresh: (freshConfig) => {
+      setActiveConfig(freshConfig);
+      onCardUnlocked?.(freshConfig);
+    },
+    onSessionExpired: () => {
+      onRecipientSessionExpired?.();
+      setActiveConfig(config);
+      setCurrentStep(config.ecardData.has_pin ? 'pin' : 'welcome');
+    },
+    onCardUnavailable: () => onCardUnavailable?.(),
+    onFailure: () => undefined,
+  }) : null, [config, onCardUnavailable, onCardUnlocked, onRecipientSessionExpired, onRefreshAuthorizedContent]);
+
+  const handleMediaError = (event: React.SyntheticEvent<HTMLElement>) => {
+    const target = event.target;
+    if (target instanceof HTMLImageElement || target instanceof HTMLMediaElement) {
+      const failedUrl = target instanceof HTMLImageElement ? target.currentSrc || target.src : target.currentSrc || target.src;
+      if (failedUrl) void mediaRefresh?.refreshForFailedUrl(failedUrl);
+    }
+  };
 
   useEffect(() => {
     setActiveConfig(config);
@@ -304,7 +336,11 @@ export const EcardRenderer: React.FC<EcardRendererProps> = ({
             isPreviewMode={isPreviewMode}
             initialSlideId={initialSlideId}
           >
-            <SlideStageContent />
+            <SlideStageContent onRefreshMedia={onRefreshAuthorizedContent ? async () => {
+              const freshConfig = await onRefreshAuthorizedContent();
+              setActiveConfig(freshConfig);
+              onCardUnlocked?.(freshConfig);
+            } : undefined} />
           </EcardProvider>
         );
     }
@@ -324,6 +360,7 @@ export const EcardRenderer: React.FC<EcardRendererProps> = ({
           handleUserInteraction();
         }
       }}
+      onErrorCapture={handleMediaError}
     >
       <div className="w-full min-h-screen flex flex-col bg-transparent overflow-x-hidden">
         {renderStage()}

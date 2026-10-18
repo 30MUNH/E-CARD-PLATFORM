@@ -20,4 +20,7 @@ export interface CardAccessService {
    * Retrieve the full authorized E-Card configuration after unlocking (or immediately if hasPin is false).
    */
   getAuthorizedCardContent(uuidOrSlug: string, accessToken?: string): Promise<EcardConfig>;
+
+  /** Fetch fresh signed media URLs for a card whose stable asset references remain unchanged. */
+  refreshAuthorizedCardContent?(uuidOrSlug: string): Promise<EcardConfig>;
 }

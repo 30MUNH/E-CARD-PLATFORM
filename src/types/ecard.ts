@@ -53,6 +53,15 @@ export interface AlbumItem {
   order?: number;
 }
 
+export interface PdfAssetDescriptor {
+  id: string;
+  url: string;
+  filename: string;
+  mimeType: 'application/pdf';
+  sizeBytes: number;
+  isLocalPreview: boolean;
+}
+
 export interface LetterData {
   love_letters: string[];
   audio_url: string | null;
@@ -130,6 +139,7 @@ export interface EcardPreloadData {
   ecardData: EcardMetadata;
   homepageData: HomepageData;
   albumData: AlbumItem[];
+  albumPdf?: PdfAssetDescriptor | null;
   provinceImages: string[];
   letterData: LetterData;
   musicData: MusicItem[];
@@ -172,6 +182,7 @@ export interface CardSummary {
   templateName: string;
   hasPin: boolean;
   photoCount: number;
+  albumPdfFilename?: string;
   createdAt: string;
   updatedAt: string;
   publicUrl?: string;
@@ -192,6 +203,7 @@ export interface PublicCardMetadata {
 
 export interface PinVerificationResult {
   authorized: boolean;
+  unavailable?: boolean;
   accessToken?: string;
   errorMessage?: string;
   cardContent?: EcardConfig;
@@ -215,6 +227,7 @@ export interface SaveCardDraftPayload {
   newPin?: string;
   homepageData: HomepageData;
   albumData: AlbumItem[];
+  albumPdf?: PdfAssetDescriptor | null;
   letterData: LetterData;
   musicData: MusicItem[];
   videoData: VideoData;
@@ -257,7 +270,7 @@ export interface MediaAsset {
   url: string;
   filename: string;
   mimeType: string;
-  mediaType: 'image' | 'audio' | 'video';
+  mediaType: 'image' | 'audio' | 'video' | 'pdf';
   sizeBytes: number;
   createdAt: string;
   isLocalPreview: boolean;

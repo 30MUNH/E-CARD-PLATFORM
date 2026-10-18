@@ -5,12 +5,14 @@ const ALLOWED_MIME_TYPES: Record<UploadMediaCategory, string[]> = {
   image: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'],
   audio: ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-m4a', 'audio/mp4', 'audio/ogg'],
   video: ['video/mp4', 'video/webm', 'video/quicktime'],
+  pdf: ['application/pdf'],
 };
 
 const MAX_SIZE_BYTES: Record<UploadMediaCategory, number> = {
   image: 10 * 1024 * 1024, // 10 MB
   audio: 25 * 1024 * 1024, // 25 MB
   video: 50 * 1024 * 1024, // 50 MB
+  pdf: 100 * 1024 * 1024, // 100 MB
 };
 
 export class MockMediaService implements MediaService {
@@ -21,11 +23,14 @@ export class MockMediaService implements MediaService {
     const allowedMimes = ALLOWED_MIME_TYPES[category];
     const maxBytes = MAX_SIZE_BYTES[category];
 
+    const mimeType = file.type.toLowerCase();
     const mimeMatch =
-      allowedMimes.includes(file.type.toLowerCase()) ||
-      (category === 'image' && /\.(jpe?g|png|webp|gif)$/i.test(file.name)) ||
-      (category === 'audio' && /\.(mp3|wav|m4a|ogg)$/i.test(file.name)) ||
-      (category === 'video' && /\.(mp4|webm|mov)$/i.test(file.name));
+      category === 'pdf'
+        ? /\.pdf$/i.test(file.name) && (!mimeType || mimeType === 'application/pdf')
+        : allowedMimes.includes(mimeType) ||
+          (category === 'image' && /\.(jpe?g|png|webp|gif)$/i.test(file.name)) ||
+          (category === 'audio' && /\.(mp3|wav|m4a|ogg)$/i.test(file.name)) ||
+          (category === 'video' && /\.(mp4|webm|mov)$/i.test(file.name));
 
     if (!mimeMatch) {
       return {
@@ -46,7 +51,7 @@ export class MockMediaService implements MediaService {
     return { valid: true };
   }
 
-  async uploadMedia(file: File, category: UploadMediaCategory): Promise<MediaAsset> {
+  async uploadMedia(file: File, category: UploadMediaCategory, _cardId?: string): Promise<MediaAsset> {
     const validation = this.validateFile(file, category);
     if (!validation.valid) {
       throw new Error(validation.error || 'Tệp tải lên không hợp lệ');
@@ -59,7 +64,8 @@ export class MockMediaService implements MediaService {
       id,
       url: blobUrl,
       filename: file.name,
-      mimeType: file.type || `${category}/octet-stream`,
+      mimeType:
+        file.type || (category === 'pdf' ? 'application/pdf' : `${category}/octet-stream`),
       mediaType: category,
       sizeBytes: file.size,
       createdAt: new Date().toISOString(),

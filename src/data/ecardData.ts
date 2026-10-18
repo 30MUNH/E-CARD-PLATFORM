@@ -40,7 +40,7 @@ export const SLIDES: SlideDefinition[] = [
   },
   {
     id: 'album',
-    title: 'Ảnh',
+    title: 'Sách lật PDF',
     bgColor: 'bg-white',
     textColor: 'text-gray-800',
     images: [],
@@ -95,10 +95,10 @@ export const DEFAULT_SLIDE_ORDER: SlideId[] = [
 export const AVAILABLE_TEMPLATES: TemplateDefinition[] = [
   {
     id: '8fa6d2b3-ba30-4290-9ac7-7a830c23bc7a',
-    name: 'By.Duni Classic Scrapbook',
+    name: 'SONG HÀNH KÝ — Kỷ niệm dịu dàng',
     tagline: 'Ghi dấu kỷ niệm ngọt ngào với album ảnh, lá thư tay và bộ bài Love Drunk',
     description:
-      'Giao diện chuẩn By.Duni với khung ảnh Polaroid, hiệu ứng máy đánh chữ lãng mạn, trình phát nhạc và trò chơi rút bài tương tác cho cặp đôi.',
+      'Giao diện SONG HÀNH KÝ với sách lật PDF, thư tay, trình phát nhạc và trò chơi tương tác dành cho cặp đôi.',
     previewImageUrl: '/template/background-welcome.png',
     accentColor: '#A33149',
     supportedSlides: ['homepage', 'album', 'music', 'letter', 'timeline', 'game', 'video'],
@@ -225,7 +225,7 @@ export const PRELOADED_ECARD_DATA: EcardPreloadData = {
       ecard_id: '8ae32098-4fc9-4787-9d79-557a03b08532',
       youtube_id: 'JgTZvDbaTtg',
       title: 'Một Đời',
-      artist: 'Duni',
+      artist: 'SONG HÀNH KÝ',
       quote: 'Love you to the saturn and back',
       created_at: '2025-07-29T21:36:26.606Z',
       updated_at: null,
@@ -281,6 +281,7 @@ export const PRELOADED_ECARD_DATA: EcardPreloadData = {
 
 export const DEFAULT_ECARD_CONFIG: EcardConfig = {
   ...PRELOADED_ECARD_DATA,
+  albumPdf: null,
   schemaVersion: ECARD_SCHEMA_VERSION,
   title: 'Kỷ niệm Sinh nhật — Ngọc Khánh & Lê Hoàng Anh',
   description: 'Thiệp kỷ niệm sinh nhật và hành trình yêu thương',

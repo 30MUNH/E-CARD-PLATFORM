@@ -20,6 +20,9 @@ test.describe('Admin E-Card Platform Dashboard, Editor & Live Preview Suite', ()
     await expect(
       page.locator('text=Kỷ niệm 1 Năm Ngày Cưới — Minh Anh & Quốc Bảo')
     ).toBeVisible();
+
+    const publicCardUrl = new URL('/ecd/game/demo-anniversary-2025', page.url()).href;
+    await expect(page.getByText(publicCardUrl, { exact: true })).toBeVisible();
   });
 
   test('2. E-Card Management (/admin/cards) supports search and status filtering', async ({
@@ -64,9 +67,8 @@ test.describe('Admin E-Card Platform Dashboard, Editor & Live Preview Suite', ()
 
     // Section 2: Media Upload & Ordering
     await page.locator('button[role="tab"]:has-text("2. Đa phương tiện")').click();
-    await expect(page.locator('text=Album Ảnh Kỷ Niệm (3 ảnh)')).toBeVisible();
-    const firstCaptionInput = page.locator('input[aria-label="Chú thích ảnh 1"]');
-    await firstCaptionInput.fill('Khoảnh khắc Đà Lạt mộng mơ');
+    await expect(page.locator('text=Sách lật PDF')).toBeVisible();
+    await expect(page.locator('text=Chưa có sách PDF')).toBeVisible();
 
     // Section 3: Content & Letter
     await page.locator('button[role="tab"]:has-text("3. Nội dung & Thư")').click();

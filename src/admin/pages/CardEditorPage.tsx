@@ -159,7 +159,7 @@ export const CardEditorPage: React.FC = () => {
             {draft.title || 'Thiệp chưa đặt tên'}
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {draft.senderName} → {draft.recipientName} • {draft.albumData.length} ảnh •{' '}
+            {draft.senderName} → {draft.recipientName} • {draft.albumPdf ? 'Đã có sách PDF' : 'Chưa có sách PDF'} •{' '}
             {draft.letterData.love_letters.length} đoạn thư
           </p>
         </div>

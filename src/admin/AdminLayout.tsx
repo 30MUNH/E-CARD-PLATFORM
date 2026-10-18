@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Menu, Plus, Sparkles } from 'lucide-react';
 import { AdminSidebar } from './AdminSidebar';
+import { clearAdminAccessToken, getAdminAccessToken } from '../services/api/auth';
+import { isApiMode } from '../services/api/config';
 
 export const AdminLayout: React.FC = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const location = useLocation();
+  const apiMode = isApiMode();
+
+  if (apiMode && !getAdminAccessToken()) {
+    return <Navigate to="/admin/login" replace state={{ from: `${location.pathname}${location.search}` }} />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col lg:flex-row">
@@ -28,11 +36,12 @@ export const AdminLayout: React.FC = () => {
 
             <div className="hidden sm:flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
               <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <span>Frontend Platform v1.0 — Mock Service Adapter Active</span>
+              <span>{apiMode ? 'SONG HÀNH KÝ — Cloud Storage Active' : 'SONG HÀNH KÝ — Chế độ xem thử'}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            {apiMode && <button type="button" onClick={() => { clearAdminAccessToken(); window.location.assign('/admin/login'); }} className="text-sm font-medium text-slate-600 hover:text-rose-700">Đăng xuất</button>}
             <Link
               to="/admin/cards/new"
               className="inline-flex items-center gap-2 bg-[#A33149] hover:bg-[#8e283e] text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm transition"

@@ -1,0 +1,393 @@
+.song-hanh-reader {
+  --reader-accent: #8c5261;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 22rem;
+  height: 100%;
+  overflow: hidden;
+  color: #372a2c;
+  background: linear-gradient(145deg, #fff 0%, #fbf7f4 70%, #f6eeeb 100%);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.song-hanh-reader-preview {
+  min-height: 25rem;
+  border: 1px solid #eadfdf;
+  border-radius: 1rem;
+}
+
+.song-hanh-reader-toolbar {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3.5rem;
+  padding: 0.5rem clamp(0.75rem, 2vw, 1.5rem);
+  border-bottom: 1px solid rgba(140, 82, 97, 0.12);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+}
+
+.song-hanh-reader-brand,
+.song-hanh-reader-tools,
+.song-hanh-reader-contents-title {
+  display: flex;
+  align-items: center;
+}
+
+.song-hanh-reader-brand {
+  gap: 0.6rem;
+  color: #7b354a;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.song-hanh-reader-brand-mark {
+  display: inline-grid;
+  width: 1.8rem;
+  height: 1.8rem;
+  place-items: center;
+  border: 1px solid #b98a91;
+  border-radius: 50%;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.53rem;
+  letter-spacing: 0.02em;
+}
+
+.song-hanh-reader-tools {
+  gap: 0.2rem;
+}
+
+.song-hanh-reader-tools button,
+.song-hanh-reader-navigation button {
+  display: inline-grid;
+  flex: 0 0 auto;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 0;
+  border-radius: 0.65rem;
+  color: #5f4d50;
+  background: transparent;
+  cursor: pointer;
+  transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+.song-hanh-reader-card-navigation {
+  display: flex;
+  justify-content: space-between;
+  width: min(100%, 46rem);
+  margin: 0 auto;
+  padding: 0.5rem 1rem 1rem;
+}
+
+.song-hanh-reader-card-navigation button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgb(163 49 73 / 16%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 90%);
+  padding: 0.5rem 0.85rem;
+  color: #7e263b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 5px 18px rgb(70 24 35 / 8%);
+}
+
+.song-hanh-reader-card-navigation button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.song-hanh-reader-card-navigation img {
+  width: 1.25rem;
+  height: 1.25rem;
+  object-fit: contain;
+}
+
+.song-hanh-reader-tools button:hover,
+.song-hanh-reader-navigation button:hover:not(:disabled) {
+  color: #7b354a;
+  background: #f4e9e9;
+}
+
+.song-hanh-reader-tools button:active,
+.song-hanh-reader-navigation button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.song-hanh-reader-tools button:disabled,
+.song-hanh-reader-navigation button:disabled {
+  color: #c8babb;
+  cursor: not-allowed;
+}
+
+.song-hanh-reader button:focus-visible,
+.song-hanh-reader input:focus-visible {
+  outline: 2px solid #a33149;
+  outline-offset: 2px;
+}
+
+.song-hanh-reader-stage {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.75rem;
+}
+
+.song-hanh-reader-book-scroll {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  overflow: auto;
+}
+
+.song-hanh-reader-book-scale {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+  transition: transform 180ms ease;
+}
+
+.song-hanh-reader-book {
+  margin-inline: auto;
+}
+
+.song-hanh-pdf-page {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: inset 0 0 1px rgba(55, 42, 44, 0.15);
+}
+
+.song-hanh-pdf-page canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.song-hanh-pdf-page-number {
+  position: absolute;
+  bottom: 0.55rem;
+  left: 50%;
+  color: #9d8f90;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.62rem;
+  transform: translateX(-50%);
+}
+
+.song-hanh-reader-contents {
+  position: absolute;
+  z-index: 5;
+  top: 4.1rem;
+  right: 0.75rem;
+  width: min(18rem, calc(100% - 1.5rem));
+  max-height: min(22rem, 55%);
+  overflow: hidden;
+  border: 1px solid #e7d9d9;
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 16px 35px rgba(80, 44, 52, 0.16);
+}
+
+.song-hanh-reader-contents-title {
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  color: #7b354a;
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-bottom: 1px solid #f0e8e7;
+}
+
+.song-hanh-reader-contents-list {
+  max-height: 17rem;
+  overflow-y: auto;
+  padding: 0.35rem;
+  font-family: system-ui, sans-serif;
+}
+
+.song-hanh-reader-contents-list button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.65rem;
+  border: 0;
+  border-radius: 0.45rem;
+  color: #56494b;
+  background: transparent;
+  text-align: left;
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.song-hanh-reader-contents-list button:hover {
+  color: #7b354a;
+  background: #f8f1f1;
+}
+
+.song-hanh-reader-contents-list small {
+  color: #9e898d;
+  font-variant-numeric: tabular-nums;
+}
+
+.song-hanh-reader-navigation {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem clamp(0.5rem, 2vw, 1.2rem) 0.7rem;
+  border-top: 1px solid rgba(140, 82, 97, 0.12);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+}
+
+.song-hanh-reader-navigation input[type='range'] {
+  flex: 1;
+  min-width: 3rem;
+  accent-color: #8c5261;
+  cursor: pointer;
+}
+
+.song-hanh-reader-page-count {
+  min-width: 3.3rem;
+  color: #7d6a6d;
+  font-family: system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.song-hanh-reader-state,
+.song-hanh-reader-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  max-width: 28rem;
+  padding: 2rem;
+  color: #795a60;
+  font-family: system-ui, sans-serif;
+  text-align: center;
+}
+
+.song-hanh-reader-empty {
+  flex: 1;
+  margin: auto;
+}
+
+.song-hanh-reader-empty p {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.song-hanh-reader-empty small,
+.song-hanh-reader-state span {
+  color: #8f7c7f;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.song-hanh-reader-mark {
+  display: grid;
+  width: 2.8rem;
+  height: 2.8rem;
+  place-items: center;
+  border: 1px solid #cbaab0;
+  border-radius: 50%;
+  color: #8c5261;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.song-hanh-reader-error {
+  color: #8d334b;
+}
+
+.song-hanh-reader-error button {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #d8b8bf;
+  border-radius: 0.55rem;
+  color: #7b354a;
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.song-hanh-reader-spinner {
+  animation: song-hanh-spin 1s linear infinite;
+}
+
+@keyframes song-hanh-spin {
+  to { transform: rotate(360deg); }
+}
+
+.song-hanh-reader:fullscreen {
+  min-height: 100dvh;
+  height: 100dvh;
+}
+
+@media (max-width: 480px) {
+  .song-hanh-reader-toolbar {
+    min-height: 3rem;
+    padding-inline: 0.45rem;
+  }
+
+  .song-hanh-reader-brand {
+    gap: 0.35rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.09em;
+  }
+
+  .song-hanh-reader-brand-mark {
+    width: 1.55rem;
+    height: 1.55rem;
+    font-size: 0.48rem;
+  }
+
+  .song-hanh-reader-tools {
+    gap: 0;
+  }
+
+  .song-hanh-reader-tools button,
+  .song-hanh-reader-navigation button {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .song-hanh-reader-tools svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .song-hanh-reader-stage {
+    padding: 0.5rem 0.25rem;
+  }
+}

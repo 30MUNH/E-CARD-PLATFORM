@@ -246,7 +246,7 @@ export const MusicView: React.FC<MusicViewProps> = ({
   }, [player, hasCustomAudio]);
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const artistLabel = musicItem?.artist || 'Duni';
+  const artistLabel = musicItem?.artist || 'SONG HÀNH KÝ';
   const quoteLabel = musicItem?.quote || 'Love you to the saturn and back';
 
   return (

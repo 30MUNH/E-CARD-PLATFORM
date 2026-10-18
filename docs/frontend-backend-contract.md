@@ -1,6 +1,6 @@
 # Frontend / Backend Integration Contract (`v1.0.0`)
 
-**Project:** By.Duni E-Card Platform (`/home/tts/Documents/LHA`)  
+**Project:** SONG HÀNH KÝ E-Card Platform (`/home/tts/Documents/LHA`)
 **Schema Version:** `1.0.0` (`ECARD_SCHEMA_VERSION` in [`src/types/ecard.ts`](file:///home/tts/Documents/LHA/src/types/ecard.ts))  
 **Frontend Owner:** Antigravity  
 **Backend Owner:** OpenAI Codex  
@@ -65,6 +65,7 @@ export interface EcardConfig {
   ecardData: EcardMetadata;
   homepageData: HomepageData;
   albumData: AlbumItem[];
+  albumPdf?: PdfAssetDescriptor | null;
   provinceImages: string[];
   letterData: LetterData;
   musicData: MusicItem[];
@@ -77,6 +78,17 @@ export interface EcardConfig {
   welcomeConfig?: WelcomeConfig;
   pinScreenConfig?: PinScreenConfig;
   themeCustomization?: ThemeCustomization;
+}
+```
+
+```ts
+export interface PdfAssetDescriptor {
+  id: string;
+  url: string;
+  filename: string;
+  mimeType: 'application/pdf';
+  sizeBytes: number;
+  isLocalPreview: boolean;
 }
 ```
 
@@ -146,8 +158,8 @@ Used by the Admin Media Upload section for images, audio recordings, and optiona
 
 | Method Signature | Suggested HTTP Endpoint | Constraints | Response Shape |
 | :--- | :--- | :--- | :--- |
-| `validateFile(file: File, expectedType: 'image' \| 'audio' \| 'video'): MediaUploadValidation` | Client-side pre-flight check | Images: `jpeg/png/webp` ≤ 10 MB; Audio: `mp3/wav/m4a/ogg` ≤ 25 MB; Video: `mp4/webm` ≤ 50 MB | `{ valid: boolean; error?: string }` |
-| `uploadMedia(file: File, expectedType: 'image' \| 'audio' \| 'video'): Promise<MediaAsset>` | `POST /api/admin/media` (`multipart/form-data`) | Field `file`, `mediaType` | `{ data: MediaAsset }` |
+| `validateFile(file: File, expectedType: 'image' \| 'audio' \| 'video' \| 'pdf'): MediaUploadValidation` | Client-side pre-flight check | Images: `jpeg/png/webp` ≤ 10 MB; Audio: `mp3/wav/m4a/ogg` ≤ 25 MB; Video: `mp4/webm` ≤ 50 MB; PDF: `.pdf` / `application/pdf` ≤ 100 MB | `{ valid: boolean; error?: string }` |
+| `uploadMedia(file: File, expectedType: 'image' \| 'audio' \| 'video' \| 'pdf'): Promise<MediaAsset>` | `POST /api/admin/media` (`multipart/form-data`) | Field `file`, `mediaType`; backend verifies file signature and enforces limits independently | `{ data: MediaAsset }` |
 | `deleteMedia(id: string): Promise<void>` | `DELETE /api/admin/media/:id` | Path param `:id` | `204 No Content` |
 
 ### 4.3 `CardAccessService` ([`src/services/CardAccessService.ts`](file:///home/tts/Documents/LHA/src/services/CardAccessService.ts))
@@ -156,9 +168,17 @@ Used by the public Recipient Experience (`/ecd/game/:uuid`).
 
 | Method Signature | Suggested HTTP Endpoint | Request Body / Headers | Response Shape |
 | :--- | :--- | :--- | :--- |
-| `getPublicMetadata(uuidOrSlug: string): Promise<PublicCardMetadata>` | `GET /api/public/cards/:uuidOrSlug/metadata` | Public (no auth header) | `{ data: PublicCardMetadata }` |
+| `getPublicMetadata(uuidOrSlug: string): Promise<PublicCardMetadata>` | `GET /api/public/cards/:uuidOrSlug/metadata` | Public (no auth header); never return `albumPdf.url` for PIN-protected cards | `{ data: PublicCardMetadata }` |
 | `verifyPin(uuidOrSlug: string, pin: string): Promise<PinVerificationResult>` | `POST /api/public/cards/:uuidOrSlug/verify-pin` | `{ pin: string }` (4 numeric digits) | `{ data: PinVerificationResult }` |
 | `getAuthorizedCardContent(uuidOrSlug: string, accessToken?: string): Promise<EcardConfig>` | `GET /api/public/cards/:uuidOrSlug/content` | `Authorization: Bearer <accessToken>` (if `hasPin`) | `{ data: EcardConfig }` |
+
+### 4.4 PDF album storage and recipient delivery
+
+- A card contains at most one `albumPdf` descriptor; the legacy `albumData` array remains readable only for old records.
+- The mock media adapter creates a browser `blob:` URL for local preview. That URL is session-local, cannot be used as a durable customer link, and must never be presented as a published cloud asset.
+- Production upload must store the PDF in durable object storage and return a stable asset ID and URL. The public card page obtains the PDF descriptor only with authorized card content when PIN protection is enabled.
+- For private PDFs, the returned URL must be access-controlled (for example, a short-lived signed URL issued after PIN verification) or proxied through an endpoint that checks the authorization token. Do not put long-lived public object URLs in `PublicCardMetadata` or unauthenticated card responses.
+- The upload API must validate actual PDF content, extension/MIME, and the 100 MB maximum on the server; client checks are only a preflight convenience.
 
 ---
 
