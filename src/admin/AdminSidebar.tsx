@@ -135,16 +135,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         </nav>
 
         <div className="p-4 border-t border-slate-200 space-y-3">
-          <div className={`rounded-xl border p-3 text-xs ${apiMode ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
-            <div className="font-semibold mb-0.5">
-              {apiMode ? 'Nguồn dữ liệu: API / Supabase' : 'Chế độ xem thử'}</div>
-            <p className={`${apiMode ? 'text-emerald-700' : 'text-amber-700'} leading-relaxed`}>
-              {apiMode
-                ? 'Danh sách thiệp và nội dung được tải từ dữ liệu đã lưu trên máy chủ.'
-                : 'Đang dùng dữ liệu mẫu trên trình duyệt; hãy bật API mode để dùng dữ liệu thật.'}
-            </p>
-          </div>
-
           {apiMode ? (
             <a
               href={publishedCardPath || '/admin/cards'}

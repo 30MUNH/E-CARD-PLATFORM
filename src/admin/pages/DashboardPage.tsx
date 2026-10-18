@@ -10,14 +10,17 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import { getCardRepository } from '../../services';
-import { CardSummary } from '../../types/ecard';
+import { CardSummary, EcardConfig } from '../../types/ecard';
 import { useEditor } from '../context/EditorContext';
 import { StatCard } from '../components/StatCard';
 import { RecentCardsTable } from '../components/RecentCardsTable';
+import { CardDetailsDialog } from '../components/CardDetailsDialog';
 
 export const DashboardPage: React.FC = () => {
   const [cards, setCards] = useState<CardSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedCard, setSelectedCard] = useState<EcardConfig | null>(null);
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false);
   const navigate = useNavigate();
   const { initializeFromCard } = useEditor();
 
@@ -70,12 +73,21 @@ export const DashboardPage: React.FC = () => {
     try {
       const repository = getCardRepository();
       await repository.archiveCard(cardId);
-      toast.success(repository.isMockMode
-        ? 'Đã chuyển thiệp mẫu vào mục Lưu trữ'
-        : 'Đã chuyển thiệp vào mục Lưu trữ trên Supabase');
+      toast.success('Đã chuyển thiệp vào mục Lưu trữ');
       await loadCards();
     } catch {
       toast.error('Không thể lưu trữ thiệp');
+    }
+  };
+
+  const handleViewDetails = async (cardId: string) => {
+    setIsDetailsLoading(true);
+    try {
+      setSelectedCard(await getCardRepository().getCard(cardId));
+    } catch {
+      toast.error('Không thể tải chi tiết thiệp');
+    } finally {
+      setIsDetailsLoading(false);
     }
   };
 
@@ -184,11 +196,25 @@ export const DashboardPage: React.FC = () => {
             cards={cards.slice(0, 5)}
             onEdit={handleEdit}
             onPreview={handlePreview}
-            onPublish={handlePublish}
-            onArchive={handleArchive}
+            onViewDetails={handleViewDetails}
           />
         )}
       </div>
+      {isDetailsLoading && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/40 p-4" role="status" aria-live="polite">
+          <div className="rounded-xl bg-white px-6 py-4 text-sm font-medium text-slate-700 shadow-xl">Đang tải chi tiết thiệp…</div>
+        </div>
+      )}
+      {selectedCard && (
+        <CardDetailsDialog
+          card={selectedCard}
+          onClose={() => setSelectedCard(null)}
+          onEdit={() => handleEdit(selectedCard.ecardData.id)}
+          onPreview={() => { void handlePreview(selectedCard.ecardData.id); }}
+          onPublish={() => { const id = selectedCard.ecardData.id; setSelectedCard(null); void handlePublish(id); }}
+          onArchive={() => { const id = selectedCard.ecardData.id; setSelectedCard(null); void handleArchive(id); }}
+        />
+      )}
     </div>
   );
 };

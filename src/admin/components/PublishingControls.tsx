@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Archive, CheckCircle2, Eye, Save, Send, Wrench } from 'lucide-react';
+import { Archive, CheckCircle2, Eye, Save, Send } from 'lucide-react';
 import { PublishCardResult } from '../../types/ecard';
 
 interface PublishingControlsProps {
   cardId: string | null;
-  isMockMode: boolean;
   isDirty: boolean;
   lastSavedAt: string | null;
   onSaveDraft: () => Promise<void>;
@@ -15,7 +14,6 @@ interface PublishingControlsProps {
 
 export const PublishingControls: React.FC<PublishingControlsProps> = ({
   cardId,
-  isMockMode,
   isDirty,
   lastSavedAt,
   onSaveDraft,
@@ -59,7 +57,7 @@ export const PublishingControls: React.FC<PublishingControlsProps> = ({
           </p>
         </div>
 
-        {/* Status Summary */}
+        {/* Draft status summary */}
         <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div className="space-y-1">
             <div className="font-semibold text-slate-800">
@@ -77,10 +75,6 @@ export const PublishingControls: React.FC<PublishingControlsProps> = ({
             </div>
           </div>
 
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold self-start sm:self-center ${isMockMode ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
-            {isMockMode ? <Wrench className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
-            <span>{isMockMode ? 'Chế độ xem thử' : 'Dữ liệu thật · Supabase'}</span>
-          </span>
         </div>
 
         {/* Action Buttons */}

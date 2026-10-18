@@ -95,7 +95,7 @@ export const CardEditorPage: React.FC = () => {
     if (!editingCardId || editingCardId === 'new') {
       const created = await repo.createCard(draft);
       markSaved(created.ecardData.id);
-      toast.success(repo.isMockMode ? 'Đã lưu bản nháp mới trong chế độ xem thử' : 'Đã lưu bản nháp mới lên Supabase');
+      toast.success('Đã lưu bản nháp mới');
       navigate(`/admin/cards/${created.ecardData.id}/edit`, { replace: true });
     } else {
       const saved = await repo.saveDraft(editingCardId, draft);
@@ -126,7 +126,7 @@ export const CardEditorPage: React.FC = () => {
       markSaved(targetId);
     }
     const res = await repo.publishCard(targetId);
-    toast.success(res.integrationPending ? 'Đã xuất bản bản xem thử' : 'Đã xuất bản thiệp lên Supabase');
+    toast.success(res.integrationPending ? 'Đã xuất bản bản xem thử' : 'Đã xuất bản thiệp');
     return res;
   };
 
@@ -224,7 +224,6 @@ export const CardEditorPage: React.FC = () => {
         {activeTab === 'publish' && (
           <PublishingControls
             cardId={editingCardId}
-            isMockMode={getCardRepository().isMockMode}
             isDirty={isDirty}
             lastSavedAt={lastSavedAt}
             onSaveDraft={handleSaveDraft}

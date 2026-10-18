@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Menu, Plus, Sparkles } from 'lucide-react';
+import { Menu, Plus } from 'lucide-react';
 import { AdminSidebar } from './AdminSidebar';
 import { clearAdminAccessToken, getAdminAccessToken } from '../services/api/auth';
 import { isApiMode } from '../services/api/config';
@@ -34,10 +34,6 @@ export const AdminLayout: React.FC = () => {
               <Menu className="w-5 h-5" />
             </button>
 
-            <div className="hidden sm:flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <span>{apiMode ? 'SONG HÀNH KÝ — Cloud Storage Active' : 'SONG HÀNH KÝ — Chế độ xem thử'}</span>
-            </div>
           </div>
 
           <div className="flex items-center gap-3">

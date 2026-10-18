@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Lock, ShieldAlert, Unlock } from 'lucide-react';
+import { Eye, EyeOff, Lock, Unlock } from 'lucide-react';
 import { useEditor } from '../context/EditorContext';
-import { getCardAccessService } from '../../services';
 
 export const AccessSettingsSection: React.FC = () => {
   const { draft, updateDraft, pinForm, setPinForm } = useEditor();
-  const isMockMode = getCardAccessService().isMockMode;
   const [showPinText, setShowPinText] = useState(false);
 
   const sanitizeDigits = (val: string) => val.replace(/\D/g, '').slice(0, 4);
@@ -58,20 +56,9 @@ export const AccessSettingsSection: React.FC = () => {
           </label>
         </div>
 
-        {/* Security & Integration Boundary Banner */}
-        <div className={`rounded-xl border p-4 flex items-start gap-3 ${isMockMode ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200'}`}>
-          <ShieldAlert className={`w-5 h-5 shrink-0 mt-0.5 ${isMockMode ? 'text-amber-600' : 'text-emerald-600'}`} />
-          <div className={`text-xs space-y-1 ${isMockMode ? 'text-amber-900' : 'text-emerald-900'}`}>
-            <div className="font-bold">
-              {isMockMode ? 'PIN chỉ dùng để xem thử' : 'PIN được xác thực an toàn trên máy chủ'}
-            </div>
-            <p className={`leading-relaxed ${isMockMode ? 'text-amber-800' : 'text-emerald-800'}`}>
-              {isMockMode
-                ? <>Mã PIN chỉ được kiểm tra trong dữ liệu mẫu của trình duyệt; đây không phải chế độ bảo vệ để phát hành thiệp thật.</>
-                : <>Mã PIN được băm và xác thực trên Supabase. Thiệp chỉ trả nội dung riêng tư sau khi máy chủ cấp quyền truy cập.</>}
-            </p>
-          </div>
-        </div>
+        <p className="text-xs leading-relaxed text-slate-500">
+          Khách mời cần nhập đúng mã PIN 4 số để mở nội dung riêng tư của thiệp.
+        </p>
 
         {draft.hasPin && (
           <div className="space-y-5 pt-2">
