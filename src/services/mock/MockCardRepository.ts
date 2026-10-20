@@ -219,23 +219,84 @@ function toSummary(card: EcardConfig): CardSummary {
   };
 }
 
+const STORAGE_KEY = 'ecard.mock.cards.v1';
+
 export class MockCardRepository implements CardRepository {
   public readonly isMockMode = true;
   private store: Map<string, EcardConfig>;
 
   constructor() {
     this.store = new Map();
+    this.loadPersistedCards();
+  }
+
+  private loadPersistedCards(): void {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      if (this.store.size === 0) {
+        for (const card of INITIAL_DEMO_CARDS) {
+          this.store.set(card.ecardData.id, structuredClone(card));
+        }
+      }
+      return;
+    }
+
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          for (const card of parsed) {
+            if (card && card.ecardData && card.ecardData.id) {
+              this.store.set(card.ecardData.id, card);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to parse mock cards from localStorage:', e);
+    }
+
+    // Ensure baseline demo cards are always seeded if missing
     for (const card of INITIAL_DEMO_CARDS) {
-      this.store.set(card.ecardData.id, structuredClone(card));
+      if (!this.store.has(card.ecardData.id)) {
+        this.store.set(card.ecardData.id, structuredClone(card));
+      }
     }
   }
 
-  public getCardSync(id: string): EcardConfig | undefined {
-    const found = this.store.get(id);
+  private persistCards(): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const all = Array.from(this.store.values());
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+      } catch (e) {
+        console.warn('Failed to save mock cards to localStorage:', e);
+      }
+    }
+  }
+
+  private findInStore(idOrSlug: string): EcardConfig | undefined {
+    const direct = this.store.get(idOrSlug);
+    if (direct) return direct;
+    for (const card of this.store.values()) {
+      if (card.ecardData.id === idOrSlug || card.publicSlug === idOrSlug) {
+        return card;
+      }
+    }
+    return undefined;
+  }
+
+  public getCardSync(idOrSlug: string): EcardConfig | undefined {
+    let found = this.findInStore(idOrSlug);
+    if (!found) {
+      this.loadPersistedCards();
+      found = this.findInStore(idOrSlug);
+    }
     return found ? structuredClone(found) : undefined;
   }
 
   async listCards(filter?: CardFilterOptions): Promise<CardSummary[]> {
+    this.loadPersistedCards();
     let items = Array.from(this.store.values());
 
     if (filter?.status && filter.status !== 'all') {
@@ -257,10 +318,10 @@ export class MockCardRepository implements CardRepository {
     return items.map(toSummary);
   }
 
-  async getCard(id: string): Promise<EcardConfig> {
-    const found = this.store.get(id);
+  async getCard(idOrSlug: string): Promise<EcardConfig> {
+    const found = this.getCardSync(idOrSlug);
     if (!found) {
-      throw new Error(`Không tìm thấy thiệp với mã ID: ${id}`);
+      throw new Error(`Không tìm thấy thiệp với mã ID: ${idOrSlug}`);
     }
     return structuredClone(found);
   }
@@ -270,6 +331,7 @@ export class MockCardRepository implements CardRepository {
     const id = `ecard-${Date.now().toString(36)}`;
     const newCard = this.applyPayloadToConfig(id, payload, 'draft', now, now);
     this.store.set(id, newCard);
+    this.persistCards();
     return structuredClone(newCard);
   }
 
@@ -307,6 +369,7 @@ export class MockCardRepository implements CardRepository {
       new Date().toISOString()
     );
     this.store.set(id, updated);
+    this.persistCards();
     return structuredClone(updated);
   }
 
@@ -322,18 +385,19 @@ export class MockCardRepository implements CardRepository {
     const now = new Date().toISOString();
     existing.status = 'published';
     existing.updatedAt = now;
-    existing.publicUrl = `/ecd/game/${id}`;
-    this.store.set(id, existing);
+    existing.publicUrl = `/ecd/game/${existing.ecardData.id}`;
+    this.store.set(existing.ecardData.id, existing);
+    this.persistCards();
 
     // Note: Explicitly flags integrationPending so the UI never pretends a live server URL was created.
     return {
-      id,
+      id: existing.ecardData.id,
       status: 'published',
       publishedAt: now,
-      publicUrl: `/ecd/game/${id}`,
+      publicUrl: `/ecd/game/${existing.ecardData.id}`,
       integrationPending: true,
       message:
-        '[Chế độ Demo Frontend] Trạng thái thiệp đã chuyển sang Published trong bộ nhớ tạm. Việc khởi tạo đường dẫn công khai thực tế và lưu trữ mã PIN sẽ do hệ thống Backend (Codex) xử lý.',
+        'Thiệp đã được xuất bản và sẵn sàng chia sẻ đường dẫn. Dữ liệu đã được lưu trữ trong trình duyệt để xem trực tiếp.',
     };
   }
 
@@ -341,7 +405,8 @@ export class MockCardRepository implements CardRepository {
     const existing = await this.getCard(id);
     existing.status = 'archived';
     existing.updatedAt = new Date().toISOString();
-    this.store.set(id, existing);
+    this.store.set(existing.ecardData.id, existing);
+    this.persistCards();
     return toSummary(existing);
   }
 

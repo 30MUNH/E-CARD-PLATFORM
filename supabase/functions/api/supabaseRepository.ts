@@ -601,11 +601,13 @@ async function loadCard(client: any, cardId: string) {
 }
 
 async function loadPublicVersion(client: any, slug: string) {
-  const { data: card, error } = await client
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(slug);
+  const query = client
     .from('ecard_cards')
-    .select('id, title, status, public_slug, active_published_version_id')
-    .eq('public_slug', slug)
-    .maybeSingle();
+    .select('id, title, status, public_slug, active_published_version_id');
+  const { data: card, error } = isUuid
+    ? await query.or(`public_slug.eq.${slug},id.eq.${slug}`).maybeSingle()
+    : await query.eq('public_slug', slug).maybeSingle();
   if (error) throw databaseError(error);
   if (!card || card.status !== 'published' || !card.active_published_version_id) return null;
   const version = await loadVersion(client, card.active_published_version_id);

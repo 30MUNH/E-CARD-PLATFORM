@@ -156,6 +156,7 @@ export const CardListPage: React.FC = () => {
           onEdit={handleEdit}
           onPreview={handlePreview}
           onViewDetails={handleViewDetails}
+          onPublish={handlePublish}
         />
       )}
       {isDetailsLoading && (

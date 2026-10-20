@@ -94,7 +94,7 @@ test.describe('Admin E-Card Platform Dashboard, Editor & Live Preview Suite', ()
     await page.locator('button[role="tab"]:has-text("6. Xuất bản")').click();
     await page.locator('button:has-text("Xuất Bản Thiệp (Publish)")').click();
     await expect(
-      page.locator('text=Đã xuất bản bản xem thử')
+      page.locator('text=Đã xuất bản bản xem thử').first()
     ).toBeVisible();
   });
 

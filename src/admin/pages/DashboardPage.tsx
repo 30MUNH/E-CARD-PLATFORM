@@ -197,6 +197,7 @@ export const DashboardPage: React.FC = () => {
             onEdit={handleEdit}
             onPreview={handlePreview}
             onViewDetails={handleViewDetails}
+            onPublish={handlePublish}
           />
         )}
       </div>

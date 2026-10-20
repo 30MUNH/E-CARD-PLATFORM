@@ -1,5 +1,6 @@
-import React from 'react';
-import { Archive, CheckCircle2, Eye, FileEdit } from 'lucide-react';
+import React, { useState } from 'react';
+import { Archive, Check, CheckCircle2, Copy, ExternalLink, Eye, FileEdit, Send } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { CardSummary, EcardStatus } from '../../types/ecard';
 
 interface RecentCardsTableProps {
@@ -7,17 +8,36 @@ interface RecentCardsTableProps {
   onEdit: (cardId: string) => void;
   onPreview: (cardId: string) => void;
   onViewDetails?: (cardId: string) => void;
+  onPublish?: (cardId: string) => void;
+  onArchive?: (cardId: string) => void;
 }
 
-const STATUS_CONFIG: Record<EcardStatus, { label: string; className: string; icon: React.ComponentType<{ className?: string }> }> = {
-  published: { label: 'Đã xuất bản', className: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: CheckCircle2 },
-  draft: { label: 'Bản nháp', className: 'bg-amber-50 text-amber-800 border-amber-200', icon: FileEdit },
-  archived: { label: 'Đã lưu trữ', className: 'bg-slate-100 text-slate-600 border-slate-200', icon: Archive },
+const STATUS_CONFIG: Record<
+  EcardStatus,
+  { label: string; className: string; icon: React.ComponentType<{ className?: string }> }
+> = {
+  published: {
+    label: 'Đã xuất bản',
+    className: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    icon: CheckCircle2,
+  },
+  draft: {
+    label: 'Bản nháp',
+    className: 'bg-amber-50 text-amber-800 border-amber-200',
+    icon: FileEdit,
+  },
+  archived: {
+    label: 'Đã lưu trữ',
+    className: 'bg-slate-100 text-slate-600 border-slate-200',
+    icon: Archive,
+  },
 };
 
 function formatDate(value: string) {
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return Number.isNaN(date.getTime())
+    ? '—'
+    : date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 export const RecentCardsTable: React.FC<RecentCardsTableProps> = ({
@@ -25,7 +45,21 @@ export const RecentCardsTable: React.FC<RecentCardsTableProps> = ({
   onEdit,
   onPreview,
   onViewDetails,
+  onPublish,
 }) => {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyLink = async (url: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedId(id);
+      toast.success('Đã sao chép link công khai');
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      toast.error('Không thể sao chép');
+    }
+  };
+
   if (cards.length === 0) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center">
@@ -42,51 +76,144 @@ export const RecentCardsTable: React.FC<RecentCardsTableProps> = ({
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5">
         <p className="text-sm font-semibold text-slate-800">Danh sách thiệp</p>
-        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium tabular-nums text-slate-600">{cards.length} thiệp</span>
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium tabular-nums text-slate-600">
+          {cards.length} thiệp
+        </span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[680px] text-left">
+        <table className="w-full min-w-[760px] text-left">
           <thead>
             <tr className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold text-slate-500">
-              <th scope="col" className="px-5 py-3">Thiệp</th>
-              <th scope="col" className="px-4 py-3">Người gửi / nhận</th>
-              <th scope="col" className="px-4 py-3">Trạng thái</th>
-              <th scope="col" className="px-4 py-3">Cập nhật</th>
-              <th scope="col" className="px-5 py-3 text-right">Thao tác</th>
+              <th scope="col" className="px-5 py-3">
+                Thiệp
+              </th>
+              <th scope="col" className="px-4 py-3">
+                Người gửi / nhận
+              </th>
+              <th scope="col" className="px-4 py-3">
+                Đường dẫn công khai
+              </th>
+              <th scope="col" className="px-4 py-3">
+                Trạng thái
+              </th>
+              <th scope="col" className="px-4 py-3">
+                Cập nhật
+              </th>
+              <th scope="col" className="px-5 py-3 text-right">
+                Thao tác
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {cards.map((card) => {
               const status = STATUS_CONFIG[card.status];
               const StatusIcon = status.icon;
+              const publicPath = card.publicUrl || `/ecd/game/${card.id}`;
+              const fullPublicUrl =
+                typeof window !== 'undefined'
+                  ? new URL(publicPath, window.location.origin).href
+                  : publicPath;
+              const isCopied = copiedId === card.id;
+
               return (
                 <tr key={card.id} className="transition-colors hover:bg-slate-50/80">
                   <td className="max-w-64 px-5 py-4">
-                    <p className="truncate text-sm font-semibold text-slate-900" title={card.title}>{card.title || 'Thiệp chưa đặt tên'}</p>
-                    <p className="mt-1 truncate text-xs text-slate-500" title={card.templateName}>{card.templateName}</p>
+                    <p className="truncate text-sm font-semibold text-slate-900" title={card.title}>
+                      {card.title || 'Thiệp chưa đặt tên'}
+                    </p>
+                    <p className="mt-1 truncate text-xs text-slate-500" title={card.templateName}>
+                      {card.templateName}
+                    </p>
                   </td>
                   <td className="px-4 py-4 text-sm text-slate-700">
                     <span className="font-medium">{card.senderName || 'Chưa có tên'}</span>
-                    <span className="mx-1.5 text-slate-300" aria-hidden="true">→</span>
+                    <span className="mx-1.5 text-slate-300" aria-hidden="true">
+                      →
+                    </span>
                     <span>{card.recipientName || 'Chưa có tên'}</span>
                   </td>
                   <td className="px-4 py-4">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${status.className}`}>
-                      <StatusIcon className="h-3.5 w-3.5" aria-hidden="true" />{status.label}
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className="max-w-[280px] truncate break-all rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1 font-mono text-xs text-slate-700 hover:bg-slate-200/80"
+                        title={fullPublicUrl}
+                      >
+                        {fullPublicUrl}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => void handleCopyLink(fullPublicUrl, card.id)}
+                        className="shrink-0 rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+                        title={isCopied ? 'Đã sao chép!' : 'Sao chép link công khai'}
+                        aria-label={`Sao chép link công khai thiệp ${card.title}`}
+                      >
+                        {isCopied ? (
+                          <Check className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                        )}
+                      </button>
+                      <a
+                        href={fullPublicUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-[#A33149]"
+                        title="Mở đường dẫn công khai ở tab mới"
+                        aria-label={`Mở đường dẫn công khai cho thiệp ${card.title}`}
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                      </a>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${status.className}`}
+                    >
+                      <StatusIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                      {status.label}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-4 text-sm tabular-nums text-slate-500">{formatDate(card.updatedAt || card.createdAt)}</td>
+                  <td className="whitespace-nowrap px-4 py-4 text-sm tabular-nums text-slate-500">
+                    {formatDate(card.updatedAt || card.createdAt)}
+                  </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
+                      {onPublish && card.status !== 'published' && (
+                        <button
+                          type="button"
+                          onClick={() => onPublish(card.id)}
+                          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40"
+                          title="Xuất bản thiệp công khai"
+                          aria-label={`Xuất bản thiệp ${card.title}`}
+                        >
+                          <Send className="h-3.5 w-3.5" aria-hidden="true" />
+                          <span>Xuất bản</span>
+                        </button>
+                      )}
                       {onViewDetails && (
-                        <button type="button" onClick={() => onViewDetails(card.id)} className="min-h-10 rounded-lg bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2">
+                        <button
+                          type="button"
+                          onClick={() => onViewDetails(card.id)}
+                          className="min-h-10 rounded-lg bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
+                        >
                           Chi tiết
                         </button>
                       )}
-                      <button type="button" onClick={() => onEdit(card.id)} className="min-h-10 rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A33149]/40" aria-label={`Sửa thiệp ${card.title}`}>
+                      <button
+                        type="button"
+                        onClick={() => onEdit(card.id)}
+                        className="min-h-10 rounded-lg border border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A33149]/40"
+                        aria-label={`Sửa thiệp ${card.title}`}
+                      >
                         Sửa
                       </button>
-                      <button type="button" onClick={() => onPreview(card.id)} className="grid h-10 w-10 place-items-center rounded-lg text-slate-500 transition hover:bg-rose-50 hover:text-[#A33149] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A33149]/40" title="Xem trước thiệp" aria-label={`Xem trước thiệp ${card.title}`}>
+                      <button
+                        type="button"
+                        onClick={() => onPreview(card.id)}
+                        className="grid h-10 w-10 place-items-center rounded-lg text-slate-500 transition hover:bg-rose-50 hover:text-[#A33149] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A33149]/40"
+                        title="Xem trước thiệp"
+                        aria-label={`Xem trước thiệp ${card.title}`}
+                      >
                         <Eye className="h-4 w-4" aria-hidden="true" />
                       </button>
                     </div>
